@@ -1,0 +1,32 @@
+{
+  "name": "horizon-homes",
+  "version": "1.0.0",
+  "description": "A real estate management application for Horizon Homes.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon api/index.js",
+    "start": "node api/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NisalMallawaarachchi/horizon-homes.git"
+  },
+  "keywords": [
+    "real estate",
+    "homes",
+    "property management",
+    "app"
+  ],
+  "author": "Nisal Mallawaarachchi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NisalMallawaarachchi/horizon-homes/issues"
+  },
+  "homepage": "https://github.com/NisalMallawaarachchi/horizon-homes#readme",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "nodemon": "^3.1.9"
+  }
+}
