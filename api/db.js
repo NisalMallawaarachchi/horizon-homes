@@ -8,8 +8,8 @@ const connectDB = async () => {
     const mongoDBUrl = process.env.MONGODB_URL;
 
     // Debugging - Check if .env is loaded
-    console.log("Checking environment variables...");
-    console.log("✅ MONGODB_URL:", mongoDBUrl ? "Loaded" : "Not Found ❌");
+    console.log("🎯 Checking environment variables...");
+    console.log("🎯 MONGODB_URL:", mongoDBUrl ? "Loaded ✅" : "Not Found ❌");
 
     if (!mongoDBUrl) {
       throw new Error(
