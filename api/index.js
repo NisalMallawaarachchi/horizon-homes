@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./db.js"; // Import MongoDB connection
+import userRouter from "./routes/user.route.js"; // Import user routes
 
 dotenv.config(); // Load environment variables
 
@@ -12,16 +13,14 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// Define a basic route
-app.get("/", (req, res) => {
-  res.send("Welcome to the server!");
-});
+// Define routes
+app.use("/", userRouter);
 
 // Set the port
 const PORT = process.env.PORT || 3000;
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`); // This is Template Strings
 });
 // End of snippet
