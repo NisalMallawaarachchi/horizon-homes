@@ -18,10 +18,27 @@ app.use(express.json());
 app.use("/api/auth", authRouter); // Auth routes
 app.use("/", userRouter); // User routes
 
+// Handle unknown routes (404)
+app.use("*", (req, res) => {
+  res.status(404).json({ success: false, message: "Route not found" });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error("Error:", err); // Logs the error for debugging
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  return res.status(statusCode).json({
+    success: false,
+    statusCode,
+    error: message,
+  });
+});
+
 // Set the port
 const PORT = process.env.PORT || 3000;
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`); // This is Template Strings
+  console.log(`🚀 Server running on port ${PORT}`);
 });
