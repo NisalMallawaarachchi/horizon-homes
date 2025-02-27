@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -13,6 +13,7 @@ export default function SignUp() {
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   // Handle input change
@@ -43,6 +44,7 @@ export default function SignUp() {
   // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent multiple submissions
     setError(null);
 
     if (!validateForm()) return;
@@ -72,13 +74,24 @@ export default function SignUp() {
       }, 2000);
     } catch (error) {
       console.error("Error:", error.message);
-      setError(error.message);
-      toast.error(error.message, { position: "top-center" });
+
+      // Improve error messages
+      let userFriendlyMessage = error.message;
+      if (error.message.includes("Failed to fetch")) {
+        userFriendlyMessage = "Network error. Please check your connection.";
+      } else if (error.message.includes("Email already exists")) {
+        userFriendlyMessage =
+          "This email is already registered. Please use a different email.";
+      }
+
+      setError(userFriendlyMessage);
+      toast.error(userFriendlyMessage, { position: "top-center" });
     } finally {
       setLoading(false);
     }
   };
 
+  // Handle Google Sign-In (Placeholder function)
   const handleGoogleSignIn = () => {
     console.log("Google Sign-In Clicked!");
     // Add Google authentication logic here
@@ -100,7 +113,6 @@ export default function SignUp() {
               type="text"
               name="username"
               placeholder="Username"
-              aria-label="Username"
               className="w-full p-2 focus:outline-none"
               value={formData.username}
               onChange={handleChange}
@@ -122,11 +134,11 @@ export default function SignUp() {
             />
           </div>
 
-          {/* Password */}
-          <div className="flex items-center border-b border-gray-300 py-2">
+          {/* Password with Show Password Toggle */}
+          <div className="flex items-center border-b border-gray-300 py-2 relative">
             <FaLock className="text-emerald-500 mr-2" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Password (min 6 chars)"
               className="w-full p-2 focus:outline-none"
@@ -134,6 +146,13 @@ export default function SignUp() {
               onChange={handleChange}
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-2 text-gray-500 hover:text-emerald-500 transition duration-200"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
 
           {/* Submit Button */}
