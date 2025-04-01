@@ -31,7 +31,7 @@ export default function SignUp() {
       return false;
     }
     if (!email.trim() || !emailRegex.test(email)) {
-      setError("Enter a valid email address!");
+      setError("Please enter a valid email address!");
       return false;
     }
     if (password.length < 6) {
@@ -62,7 +62,10 @@ export default function SignUp() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || "Sign-up failed");
+        throw new Error(
+          errorData.message ||
+            "This email is already registered. Please use a different email."
+        );
       }
 
       toast.success("Account created successfully!", {
@@ -79,11 +82,7 @@ export default function SignUp() {
       let userFriendlyMessage = error.message;
       if (error.message.includes("Failed to fetch")) {
         userFriendlyMessage = "Network error. Please check your connection.";
-      } else if (error.message.includes("Email already exists")) {
-        userFriendlyMessage =
-          "This email is already registered. Please use a different email.";
       }
-
       setError(userFriendlyMessage);
       toast.error(userFriendlyMessage, { position: "top-center" });
     } finally {
