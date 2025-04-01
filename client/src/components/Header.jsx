@@ -33,7 +33,7 @@ export default function Header() {
             <Link to="/about">About</Link>
           </li>
           <li>
-            <Link to="/sign-in">
+            <Link to="/signin">
               <button className="bg-emerald-500 text-white px-4 py-1 rounded-lg hover:bg-emerald-700 transition">
                 Sign in
               </button>
