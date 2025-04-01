@@ -70,7 +70,11 @@ export default function SignUp() {
       });
 
       setTimeout(() => {
+<<<<<<< HEAD
         navigate("/signin");
+=======
+        navigate("/sign-in");
+>>>>>>> 73cf0d507a63f04eacf14a069f4612959dad38ab
       }, 2000);
     } catch (error) {
       console.error("Error:", error.message);
@@ -189,7 +193,11 @@ export default function SignUp() {
         {/* Already have an account? */}
         <p className="text-center text-gray-600 mt-4">
           Already have an account?{" "}
+<<<<<<< HEAD
           <Link to="/signin" className="text-emerald-500 font-semibold">
+=======
+          <Link to="/sign-in" className="text-emerald-500 font-semibold">
+>>>>>>> 73cf0d507a63f04eacf14a069f4612959dad38ab
             Sign in
           </Link>
         </p>

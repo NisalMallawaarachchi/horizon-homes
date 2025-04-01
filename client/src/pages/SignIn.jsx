@@ -169,7 +169,11 @@ export default function SignIn() {
         {/* Don't have an account? */}
         <p className="text-center text-gray-600 mt-4">
           Don&apos;t have an account?{" "}
+<<<<<<< HEAD
           <Link to="/signup" className="text-emerald-500 font-semibold">
+=======
+          <Link to="/sign-up" className="text-emerald-500 font-semibold">
+>>>>>>> 73cf0d507a63f04eacf14a069f4612959dad38ab
             Sign up
           </Link>
         </p>
