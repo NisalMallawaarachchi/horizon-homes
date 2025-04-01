@@ -4,16 +4,19 @@ import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
 
 export default function SignIn() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.user);
 
   // Handle input change
   const handleChange = (e) => {
@@ -26,11 +29,11 @@ export default function SignIn() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!email.trim() || !emailRegex.test(email)) {
-      setError("Enter a valid email address!");
+      toast.error("Enter a valid email address!");
       return false;
     }
     if (password.length < 6) {
-      setError("Password must be at least 6 characters!");
+      toast.error("Password must be at least 6 characters!");
       return false;
     }
     return true;
@@ -39,19 +42,13 @@ export default function SignIn() {
   // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return; // Prevent multiple submissions
-    setError(null);
-
     if (!validateForm()) return;
 
-    setLoading(true);
-
+    dispatch(signInStart());
     try {
       const res = await fetch("/api/auth/signin", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
@@ -60,47 +57,24 @@ export default function SignIn() {
         throw new Error(errorData.message || "Invalid email or password.");
       }
 
-      toast.success("Sign-in successful!", {
-        position: "top-center",
-      });
-
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
-    } catch (error) {
-      console.error("Error:", error.message);
-
-      // Improve error messages
-      let userFriendlyMessage = error.message;
-      if (error.message.includes("Failed to fetch")) {
-        userFriendlyMessage = "Network error. Please check your connection.";
-      } else if (error.message.includes("Invalid email or password")) {
-        userFriendlyMessage = "The email or password you entered is incorrect.";
-      }
-
-      setError(userFriendlyMessage);
-      toast.error(userFriendlyMessage, { position: "top-center" });
-    } finally {
-      setLoading(false);
+      const data = await res.json();
+      dispatch(signInSuccess(data));
+      toast.success("Sign-in successful!");
+      setTimeout(() => navigate("/home"), 2000);
+    } catch (err) {
+      dispatch(signInFailure(err.message));
+      toast.error(err.message);
     }
-  };
-
-  // Handle Google Sign-In (Placeholder function)
-  const handleGoogleSignIn = () => {
-    console.log("Google Sign-In Clicked!");
-    // Add Google authentication logic here
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <ToastContainer />
+      <ToastContainer position="top-center" />
       <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Sign In
         </h2>
-
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email Input */}
           <div className="flex items-center border-b border-gray-300 py-2">
             <FaEnvelope className="text-emerald-500 mr-2" />
             <input
@@ -113,8 +87,6 @@ export default function SignIn() {
               required
             />
           </div>
-
-          {/* Password Input with Toggle */}
           <div className="flex items-center border-b border-gray-300 py-2 relative">
             <FaLock className="text-emerald-500 mr-2" />
             <input
@@ -134,8 +106,6 @@ export default function SignIn() {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
-
-          {/* Submit Button */}
           <button
             disabled={loading}
             type="submit"
@@ -143,30 +113,18 @@ export default function SignIn() {
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
-
-          {/* Display Error Message */}
           {error && (
             <div className="text-red-500 text-sm text-center mt-2">{error}</div>
           )}
         </form>
-
-        {/* OR Divider */}
         <div className="relative flex items-center my-4">
           <div className="flex-grow border-t border-gray-300"></div>
           <span className="mx-4 text-gray-500">OR</span>
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
-
-        {/* Continue with Google */}
-        <button
-          onClick={handleGoogleSignIn}
-          className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition duration-300"
-        >
-          <FcGoogle className="text-2xl mr-3" />
-          Continue with Google
+        <button className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition duration-300">
+          <FcGoogle className="text-2xl mr-3" /> Continue with Google
         </button>
-
-        {/* Don't have an account? */}
         <p className="text-center text-gray-600 mt-4">
           Don&apos;t have an account?{" "}
           <Link to="/signup" className="text-emerald-500 font-semibold">
