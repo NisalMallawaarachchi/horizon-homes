@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function Header() {
-  const { currentUser } = useSelector(state => state.user);
+  const { currentUser } = useSelector((state) => state.user);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -101,7 +101,10 @@ export default function Header() {
                   className="flex items-center space-x-1 cursor-pointer"
                 >
                   <img
-                    src={currentUser.avatar}
+                    src={
+                      currentUser.avatar ||
+                      "https://i.postimg.cc/Y0JPMM7V/image.png"
+                    }
                     alt="Profile"
                     className="h-8 w-8 rounded-full object-cover"
                   />
@@ -148,31 +151,51 @@ export default function Header() {
         <div className="sm:hidden absolute top-16 left-0 right-0 bg-emerald-100 p-4 shadow-md z-40">
           <ul className="flex flex-col space-y-3">
             <li>
-              <Link to="/" onClick={() => setIsOpen(false)} className="block py-2">
+              <Link
+                to="/"
+                onClick={() => setIsOpen(false)}
+                className="block py-2"
+              >
                 Home
               </Link>
             </li>
             <li>
-              <Link to="/about" onClick={() => setIsOpen(false)} className="block py-2">
+              <Link
+                to="/about"
+                onClick={() => setIsOpen(false)}
+                className="block py-2"
+              >
                 About
               </Link>
             </li>
             {currentUser ? (
               <>
                 <li>
-                  <Link to="/profile" onClick={() => setIsOpen(false)} className="block py-2">
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className="block py-2"
+                  >
                     Profile
                   </Link>
                 </li>
                 <li>
-                  <Link to="/signout" onClick={() => setIsOpen(false)} className="block py-2">
+                  <Link
+                    to="/signout"
+                    onClick={() => setIsOpen(false)}
+                    className="block py-2"
+                  >
                     Sign Out
                   </Link>
                 </li>
               </>
             ) : (
               <li>
-                <Link to="/signin" onClick={() => setIsOpen(false)} className="block py-2">
+                <Link
+                  to="/signin"
+                  onClick={() => setIsOpen(false)}
+                  className="block py-2"
+                >
                   <button className="bg-emerald-500 text-white px-4 py-1 rounded-lg w-full">
                     Sign in
                   </button>

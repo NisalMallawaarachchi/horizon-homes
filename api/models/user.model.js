@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: "https://i.postimg.cc/Y0JPMM7V/image.png"    },
+      default: "https://i.postimg.cc/Y0JPMM7V/image.png",
+    },
   },
   { timestamps: true } // Automatically adds createdAt & updatedAt
 );
