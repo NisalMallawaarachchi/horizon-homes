@@ -5,9 +5,6 @@ export default function PrivateRoute() {
   const location = useLocation();
   const { currentUser } = useSelector((state) => state.user); // Changed from state.auth to state.user
 
-  // Optional: Add loading state handling
-  // if (loading) return <LoadingSpinner />;
-
   return currentUser ? (
     <Outlet />
   ) : (
