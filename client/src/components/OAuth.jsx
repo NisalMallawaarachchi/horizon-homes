@@ -3,7 +3,7 @@ import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
 import { app } from "../firebase";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function OAuth() {
   // Redux dispatch function
@@ -32,7 +32,8 @@ export default function OAuth() {
         }),
       });
       const data = await res.json();
-      dispatch(signInSuccess(data)); // Dispatch Redux action to indicate sign-in 
+      console.log("Backend response:", data); // Verify structure
+      dispatch(signInSuccess(data.user)); // Send only the user object
       navigate("/"); // Redirect to home page after sign-in
     } catch (error) {
       console.log("Could not sign in with google.", error);

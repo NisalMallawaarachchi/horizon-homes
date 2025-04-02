@@ -121,7 +121,15 @@ export const googleAuth = async (req, res, next) => {
         maxAge: 60 * 60 * 1000, // 1 hour
       });
 
-      return res.status(200).json({ token, user: existingUser });
+      // Return the user with avatar field
+      const { password: pass, ...userWithoutPassword } = existingUser._doc;
+      return res.status(200).json({
+        token,
+        user: {
+          ...userWithoutPassword,
+          avatar: photo, // Ensure avatar is included
+        },
+      });
     }
 
     // Generate a secure password for new Google user
@@ -133,7 +141,7 @@ export const googleAuth = async (req, res, next) => {
       username: name.toLowerCase().replace(/\s+/g, ""), // Convert name to lowercase without spaces
       email,
       password: hashedPassword,
-      avatar: req.body.photo,
+      avatar: photo,
     });
 
     await newUser.save();
@@ -151,7 +159,15 @@ export const googleAuth = async (req, res, next) => {
       maxAge: 60 * 60 * 1000, // 1 hour
     });
 
-    res.status(201).json({ token, user: newUser });
+    // Return the new user with avatar field
+    const { password: pass, ...userWithoutPassword } = newUser._doc;
+    res.status(201).json({
+      token,
+      user: {
+        ...userWithoutPassword,
+        avatar: photo, // Ensure avatar is included
+      },
+    });
   } catch (error) {
     next(error);
   }

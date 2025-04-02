@@ -8,6 +8,7 @@ const persistConfig = {
   key: "root",
   storage, // or you can use sessionStorage if you prefer
   version: 1,
+  whitelist: ['user'] // Explicitly persist only the user slice
 };
 
 const persistedReducer = persistReducer(persistConfig, userReducer);
@@ -19,6 +20,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
+      ignoredActions: ['persist/PERSIST'], // Fix for redux-persist
     }),
 });
 

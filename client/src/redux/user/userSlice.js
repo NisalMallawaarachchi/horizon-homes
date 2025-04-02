@@ -20,8 +20,8 @@ const userSlice = createSlice({
 
     // ✅ Action: When login is successful
     signInSuccess: (state, action) => {
-      state.loading = false; // Stop loading
       state.currentUser = action.payload; // Store the logged-in user data
+      state.loading = false; // Stop loading
       state.error = null; // Clear any previous errors
     },
 
