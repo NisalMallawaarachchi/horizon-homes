@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,23 +9,33 @@ import {
   signInSuccess,
   signInFailure,
 } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 export default function SignIn() {
+  // State to store form data (email and password)
   const [formData, setFormData] = useState({ email: "", password: "" });
+
+  // State to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
+
+  // Redux dispatch function
   const dispatch = useDispatch();
+
+  // React Router navigation hook
   const navigate = useNavigate();
+
+  // Extract loading and error state from Redux store
   const { loading, error } = useSelector((state) => state.user);
 
-  // Handle input change
+  // Handle input changes and update form state
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Validate form inputs before submitting
+  // Function to validate email and password before submitting
   const validateForm = () => {
     const { email, password } = formData;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for validating email format
 
     if (!email.trim() || !emailRegex.test(email)) {
       toast.error("Enter a valid email address!");
@@ -39,12 +48,12 @@ export default function SignIn() {
     return true;
   };
 
-  // Handle form submit
+  // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+    e.preventDefault(); // Prevent default form submission behavior
+    if (!validateForm()) return; // Validate form before proceeding
 
-    dispatch(signInStart());
+    dispatch(signInStart()); // Dispatch Redux action to indicate sign-in process started
     try {
       const res = await fetch("/api/auth/signin", {
         method: "POST",
@@ -58,11 +67,11 @@ export default function SignIn() {
       }
 
       const data = await res.json();
-      dispatch(signInSuccess(data));
+      dispatch(signInSuccess(data)); // Dispatch success action with user data
       toast.success("Sign-in successful!");
-      setTimeout(() => navigate("/home"), 2000);
+      setTimeout(() => navigate("/home"), 2000); // Redirect to home page after success
     } catch (err) {
-      dispatch(signInFailure(err.message));
+      dispatch(signInFailure(err.message)); // Dispatch failure action with error message
       toast.error(err.message);
     }
   };
@@ -75,6 +84,7 @@ export default function SignIn() {
           Sign In
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email input field */}
           <div className="flex items-center border-b border-gray-300 py-2">
             <FaEnvelope className="text-emerald-500 mr-2" />
             <input
@@ -87,6 +97,8 @@ export default function SignIn() {
               required
             />
           </div>
+
+          {/* Password input field with toggle visibility */}
           <div className="flex items-center border-b border-gray-300 py-2 relative">
             <FaLock className="text-emerald-500 mr-2" />
             <input
@@ -106,6 +118,8 @@ export default function SignIn() {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
+
+          {/* Submit button */}
           <button
             disabled={loading}
             type="submit"
@@ -113,18 +127,24 @@ export default function SignIn() {
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
+
+          {/* Error message display */}
           {error && (
             <div className="text-red-500 text-sm text-center mt-2">{error}</div>
           )}
         </form>
+
+        {/* Divider with OR text */}
         <div className="relative flex items-center my-4">
           <div className="flex-grow border-t border-gray-300"></div>
           <span className="mx-4 text-gray-500">OR</span>
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
-        <button className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition duration-300">
-          <FcGoogle className="text-2xl mr-3" /> Continue with Google
-        </button>
+
+        {/* OAuth sign-in component */}
+        <OAuth />
+
+        {/* Navigation to Sign-up page */}
         <p className="text-center text-gray-600 mt-4">
           Don&apos;t have an account?{" "}
           <Link to="/signup" className="text-emerald-500 font-semibold">

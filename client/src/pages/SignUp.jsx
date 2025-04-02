@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import OAuth from "../components/OAuth";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -90,11 +90,7 @@ export default function SignUp() {
     }
   };
 
-  // Handle Google Sign-In (Placeholder function)
-  const handleGoogleSignIn = () => {
-    console.log("Google Sign-In Clicked!");
-    // Add Google authentication logic here
-  };
+ 
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -176,14 +172,7 @@ export default function SignUp() {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
-        {/* Continue with Google */}
-        <button
-          onClick={handleGoogleSignIn}
-          className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition duration-300"
-        >
-          <FcGoogle className="text-2xl mr-3" />
-          Continue with Google
-        </button>
+        <OAuth/>
 
         {/* Already have an account? */}
         <p className="text-center text-gray-600 mt-4">
