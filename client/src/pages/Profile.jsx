@@ -10,10 +10,19 @@ import {
 } from "react-icons/fi";
 import { BsHouseDoor, BsBookmark, BsShieldCheck } from "react-icons/bs";
 import { HiOutlineDocumentText } from "react-icons/hi";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { app } from "../firebase";
+import { toast } from "react-toastify";
 
 export default function Profile() {
+  const imageInputRef = useRef(null);
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -22,6 +31,13 @@ export default function Profile() {
     propertiesListed: 0,
     savedProperties: 0,
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Check what's in your currentUser object
+  console.log("Current User:", currentUser);
+  console.log("User UID:", currentUser?.uid);
 
   useEffect(() => {
     if (currentUser) {
@@ -40,8 +56,87 @@ export default function Profile() {
     }
   }, [currentUser]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.match("image.*")) {
+      toast.error("Please select an image file (JPEG, PNG)");
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size should be less than 2MB");
+      return;
+    }
+
+    setImageFile(file);
+  };
+
+  const handleImageUpload = async () => {
+    if (!imageFile || !currentUser) return;
+
+    try {
+      setIsUploading(true);
+      setUploadProgress(0);
+
+      const storage = getStorage(app);
+      // Ensure currentUser.uid exists and filename is properly constructed
+      const fileName = `profile_pictures/profile_${
+        currentUser.uid
+      }_${Date.now()}.png`;
+      console.log("File path:", fileName);
+
+      const storageRef = ref(storage, fileName);
+
+      const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(Math.round(progress));
+        },
+        (error) => {
+          setIsUploading(false);
+          toast.error("Image upload failed");
+          console.error("Upload error:", error.code, error.message);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          console.log("File uploaded successfully:", downloadURL);
+
+          // Dispatch action to update user avatar in Redux store
+          dispatch({
+            type: "UPDATE_USER_AVATAR",
+            payload: downloadURL,
+          });
+
+          // Here you would typically also make an API call to update the avatar in your database
+          // await updateUserAvatar(currentUser._id, downloadURL);
+
+          setIsUploading(false);
+          setUploadProgress(0);
+          toast.success("Profile image updated successfully");
+        }
+      );
+    } catch (error) {
+      setIsUploading(false);
+      toast.error("Error uploading image");
+      console.error("Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (imageFile) {
+      handleImageUpload();
+    }
+  }, [imageFile]);
+
   const handleSignOut = () => {
-    // Dispatch sign-out action
     dispatch({ type: "LOGOUT" });
     navigate("/signin");
   };
@@ -70,29 +165,59 @@ export default function Profile() {
         >
           <div className="bg-gradient-to-r from-emerald-500 to-teal-400 h-32 sm:h-40 w-full relative">
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+            {isUploading && (
+              <div className="absolute bottom-0 left-0 right-0 bg-gray-200 h-1.5">
+                <div
+                  className="bg-white h-full transition-all duration-300 ease-out"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+            )}
           </div>
           <div className="px-6 pb-8 relative">
             <div className="flex flex-col sm:flex-row items-start sm:items-end -mt-12 sm:-mt-16">
-              {" "}
-              {/* Reduced negative margin */}
               <div className="relative group">
-                <img
-                  src={
-                    currentUser?.avatar ||
-                    "https://avatars.dicebear.com/api/initials/" +
-                      (currentUser?.username || "user") +
-                      ".svg"
-                  }
-                  alt={currentUser?.username || "User profile"}
-                  className="h-24 w-24 sm:h-32 sm:w-32 rounded-full border-4 border-white bg-white shadow-lg object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105"
+                <input
+                  onChange={handleImageChange}
+                  type="file"
+                  ref={imageInputRef}
+                  hidden
+                  accept="image/*"
+                  disabled={isUploading}
                 />
-                <div className="absolute inset-0 bg-black/30 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
-                  <FiEdit className="text-white text-xl" />
+                <div className="relative">
+                  <img
+                    src={
+                      currentUser?.avatar ||
+                      `https://avatars.dicebear.com/api/initials/${
+                        currentUser?.username || "user"
+                      }.svg`
+                    }
+                    alt={currentUser?.username || "User profile"}
+                    className={`h-24 w-24 sm:h-32 sm:w-32 rounded-full border-4 border-white bg-white shadow-lg object-cover transition-transform duration-300 ${
+                      isUploading
+                        ? "opacity-70"
+                        : "cursor-pointer group-hover:scale-105"
+                    }`}
+                  />
+                  {isUploading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-10 h-10 border-4 border-white border-t-emerald-500 rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                  {!isUploading && (
+                    <div
+                      className="absolute inset-0 bg-black/30 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300 cursor-pointer"
+                      onClick={() =>
+                        !isUploading && imageInputRef.current.click()
+                      }
+                    >
+                      <FiEdit className="text-white text-xl" />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="sm:ml-6 mt-2 sm:mt-0 flex-1">
-                {" "}
-                {/* Reduced top margin */}
                 <div className="flex items-center">
                   <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
                     {currentUser?.username || "Username"}
@@ -108,8 +233,6 @@ export default function Profile() {
                   {currentUser?.email || "user@example.com"}
                 </p>
                 <div className="flex-wrap items-center mt-2 text-sm text-gray-500 gap-3 -ml-3">
-                  {" "}
-                  {/* Added negative left margin */}
                   <span className="flex items-center bg-gray-50 px-3 py-1 rounded-full">
                     <BsHouseDoor className="mr-2" />
                     Member since{" "}
@@ -117,13 +240,17 @@ export default function Profile() {
                       ? new Date(currentUser.createdAt).toLocaleDateString()
                       : "N/A"}
                   </span>
-                 
                 </div>
               </div>
               <div className="ml-auto mt-4 sm:mt-0">
                 <Link
                   to="/profile/edit"
-                  className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all shadow-md hover:shadow-emerald-200"
+                  className={`flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg transition-all shadow-md ${
+                    isUploading
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-emerald-700 hover:shadow-emerald-200"
+                  }`}
+                  onClick={(e) => isUploading && e.preventDefault()}
                 >
                   <FiEdit className="mr-2" />
                   Edit Profile

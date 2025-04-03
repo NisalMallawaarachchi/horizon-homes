@@ -18,21 +18,32 @@ export default function OAuth() {
       const provider = new GoogleAuthProvider();
       const auth = getAuth(app);
 
+      // 1. Sign in with Firebase client-side
       const result = await signInWithPopup(auth, provider);
+      const firebaseUser = result.user;
 
+      // 2. Send to your backend with Firebase ID token
       const res = await fetch("api/auth/google", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${await firebaseUser.getIdToken()}`
         },
         body: JSON.stringify({
           name: result.user.displayName,
           email: result.user.email,
           photo: result.user.photoURL,
+          uid: firebaseUser.uid  // Include Firebase UID
         }),
       });
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+      
       const data = await res.json();
       console.log("Backend response:", data); // Verify structure
+      
+      // 4. Dispatch to Redux with complete user data
       dispatch(signInSuccess(data.user)); // Send only the user object
       navigate("/"); // Redirect to home page after sign-in
     } catch (error) {
