@@ -102,14 +102,14 @@ export default function Header() {
                 >
                   <img
                     src={
-                      currentUser.avatar ||
+                      currentUser?.avatar ||
                       "https://i.postimg.cc/Y0JPMM7V/image.png"
                     }
                     alt="Profile"
                     className="h-8 w-8 rounded-full object-cover"
                   />
                   <span className="hidden md:inline">
-                    Welcome, {currentUser.username}
+                    Welcome, {currentUser?.username}
                   </span>
                 </button>
                 {dropdownOpen && (
