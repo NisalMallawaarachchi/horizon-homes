@@ -20,6 +20,11 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 import { toast } from "react-toastify";
+import {
+  signOutUserStart,
+  signOutUserSuccess,
+  signOutUserFailure,
+} from "../redux/user/userSlice"; // Adjust the path as needed
 
 export default function Profile() {
   const imageInputRef = useRef(null);
@@ -34,10 +39,6 @@ export default function Profile() {
   const [imageFile, setImageFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-
-  // Check what's in your currentUser object
-  console.log("Current User:", currentUser);
-  console.log("User UID:", currentUser?.uid);
 
   useEffect(() => {
     if (currentUser) {
@@ -136,9 +137,25 @@ export default function Profile() {
     }
   }, [imageFile]);
 
-  const handleSignOut = () => {
-    dispatch({ type: "LOGOUT" });
-    navigate("/signin");
+  const handleSignOut = async () => {
+    try {
+      dispatch(signOutUserStart());
+
+      const response = await fetch("/api/auth/signout");
+
+      if (!response.ok) {
+        throw new Error("Sign out failed");
+      }
+
+      const data = await response.json();
+      console.log("Sign-out response:", data);
+
+      dispatch(signOutUserSuccess());
+      navigate("/signin");
+    } catch (error) {
+      dispatch(signOutUserFailure(error.message));
+      console.error("Sign out error:", error);
+    }
   };
 
   if (loading) {

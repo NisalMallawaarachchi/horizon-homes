@@ -1,25 +1,28 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./user/userSlice"; // Adjust the path as necessary
+import userReducer from "./user/userSlice";
 import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // default is localStorage
+import storage from "redux-persist/lib/storage"; // localStorage
+import { PERSIST, PURGE } from "redux-persist"; // Add PURGE for logout
 
-// Set up persist configuration
-const persistConfig = {
-  key: "root",
-  storage, // or you can use sessionStorage if you prefer
+// Persist config (only persist user data)
+const userPersistConfig = {
+  key: "user", // Unique key for user slice
+  storage,
   version: 1,
 };
 
-const persistedReducer = persistReducer(persistConfig, userReducer);
+// Persist only the user reducer
+const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
 
 export const store = configureStore({
   reducer: {
-    user: persistedReducer, // Persist the user reducer
+    user: persistedUserReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false,
-      ignoredActions: ['persist/PERSIST'], // Fix for redux-persist
+      serializableCheck: {
+        ignoredActions: [PERSIST, PURGE], // Fix for redux-persist warnings
+      },
     }),
 });
 

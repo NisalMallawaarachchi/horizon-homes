@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { FaSearch, FaBars, FaTimes } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { signOutUserStart, signOutUserSuccess, signOutUserFailure } from "../redux/user/userSlice"; // Adjust the path as needed
 
 export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
@@ -10,6 +11,28 @@ export default function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+ const handleSignOut = async () => {
+     try {
+       dispatch(signOutUserStart());
+ 
+       const response = await fetch("/api/auth/signout");
+ 
+       if (!response.ok) {
+         throw new Error("Sign out failed");
+       }
+ 
+       const data = await response.json();
+       console.log("Sign-out response:", data);
+ 
+       dispatch(signOutUserSuccess());
+       navigate("/signin");
+     } catch (error) {
+       dispatch(signOutUserFailure(error.message));
+       console.error("Sign out error:", error);
+     }
+   };
   const location = useLocation();
 
   const handleSubmit = (e) => {
@@ -182,7 +205,7 @@ export default function Header() {
                 <li>
                   <Link
                     to="/signout"
-                    onClick={() => setIsOpen(false)}
+                    onClick={handleSignOut}
                     className="block py-2"
                   >
                     Sign Out
