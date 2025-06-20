@@ -6,9 +6,13 @@ import connectDB from "./db.js";
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
 
-dotenv.config(); // Load environment variables early
+// Load environment variables early
+dotenv.config();
+
+// Connect to the database
 connectDB();
 
+// Initialize the Express application
 const app = express();
 
 // Middleware
@@ -32,18 +36,20 @@ app.use("*", (req, res) => {
 });
 
 // Global error handler
-app.use((err, req, res, next) => {
-  console.error("Error:", err);
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-  return res.status(statusCode).json({
-    success: false,
-    statusCode,
-    error: message,
-  });
-});
+// app.use((err, req, res, next) => {
+//   console.error("Error:", err);
+//   const statusCode = err.statusCode || 500;
+//   const message = err.message || "Internal Server Error";
+//   return res.status(statusCode).json({
+//     success: false,
+//     statusCode,
+//     error: message,
+//   });
+// });
 
 const PORT = process.env.PORT || 3000;
+
+// Start the server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
