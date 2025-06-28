@@ -35,17 +35,17 @@ app.use("*", (req, res) => {
   res.status(404).json({ success: false, message: "Route not found" });
 });
 
-// Global error handler
-// app.use((err, req, res, next) => {
-//   console.error("Error:", err);
-//   const statusCode = err.statusCode || 500;
-//   const message = err.message || "Internal Server Error";
-//   return res.status(statusCode).json({
-//     success: false,
-//     statusCode,
-//     error: message,
-//   });
-// });
+// Global error handler (middleware)
+app.use((err, req, res, next) => {
+  console.error("Error:", err);
+  const statusCode = err.statusCode || 500; // If the error has a status code, use it; otherwise, default to 500
+  const message = err.message || "Internal Server Error"; // If the error has a specific message, use it; otherwise, default to a generic message
+  return res.status(statusCode).json({
+    success: false,
+    statusCode,
+    error: message,
+  });
+});
 
 const PORT = process.env.PORT || 3000;
 
