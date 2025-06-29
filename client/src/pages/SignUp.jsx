@@ -78,13 +78,6 @@ export default function SignUp() {
     } catch (error) {
       console.error("Error:", error.message);
 
-      // Improve error messages
-      // let userFriendlyMessage = error.message;
-      // if (error.message.includes("Failed to fetch")) {
-      //   userFriendlyMessage = "Network error. Please check your connection.";
-      // }
-      // setError(userFriendlyMessage);
-      // toast.error(userFriendlyMessage, { position: "top-center" });
     } finally {
       setLoading(false);
     }

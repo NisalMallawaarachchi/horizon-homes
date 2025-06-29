@@ -70,8 +70,7 @@ export const signin = async (req, res, next) => {
       expiresIn: "1h",
     });
 
-    // Convert the user to an object and exclude password
-    const { password: pass, ...rest } = validUser._doc;
+    const { password: pass, ...rest } = validUser._doc; // Exclude password from response
 
     // Set HTTP-only cookie with the token
     res.cookie("access_token", token, {
