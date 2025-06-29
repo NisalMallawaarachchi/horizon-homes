@@ -44,7 +44,7 @@ export default function OAuth() {
       console.log("Backend response:", data); // Verify structure
       
       // 4. Dispatch to Redux with complete user data
-      dispatch(signInSuccess(data.user)); // Send only the user object
+      dispatch(signInSuccess(data)); // Send only the user object
       navigate("/"); // Redirect to home page after sign-in
     } catch (error) {
       console.log("Could not sign in with google.", error);
