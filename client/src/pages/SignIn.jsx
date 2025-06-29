@@ -15,6 +15,9 @@ export default function SignIn() {
   // State to store form data (email and password)
   const [formData, setFormData] = useState({ email: "", password: "" });
 
+  // Extract loading and error state from Redux store
+  const { loading, error } = useSelector((state) => state.user);
+  
   // State to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
 
@@ -23,9 +26,6 @@ export default function SignIn() {
 
   // React Router navigation hook
   const navigate = useNavigate();
-
-  // Extract loading and error state from Redux store
-  const { loading, error } = useSelector((state) => state.user);
 
   // Handle input changes and update form state
   const handleChange = (e) => {
@@ -54,7 +54,8 @@ export default function SignIn() {
     if (!validateForm()) return; // Validate form before proceeding
 
     dispatch(signInStart()); // Dispatch Redux action to indicate sign-in process started
-    try {
+     try {
+      
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -67,6 +68,11 @@ export default function SignIn() {
       }
 
       const data = await res.json();
+      console.log("Sign-in response:", data); // Log the response for debugging
+      if(data.success === false) {
+        dispatch(signInFailure(data.message));
+        return;
+      }
       dispatch(signInSuccess(data)); // Dispatch success action with user data
       toast.success("Sign-in successful!");
       setTimeout(() => navigate("/home"), 2000); // Redirect to home page after success
