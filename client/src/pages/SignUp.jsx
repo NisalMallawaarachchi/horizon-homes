@@ -43,7 +43,7 @@ export default function SignUp() {
 
   // Handle form submit
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent refreshing the page
     if (loading) return; // Prevent multiple submissions
     setError(null);
 
@@ -52,7 +52,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch("api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -79,12 +79,12 @@ export default function SignUp() {
       console.error("Error:", error.message);
 
       // Improve error messages
-      let userFriendlyMessage = error.message;
-      if (error.message.includes("Failed to fetch")) {
-        userFriendlyMessage = "Network error. Please check your connection.";
-      }
-      setError(userFriendlyMessage);
-      toast.error(userFriendlyMessage, { position: "top-center" });
+      // let userFriendlyMessage = error.message;
+      // if (error.message.includes("Failed to fetch")) {
+      //   userFriendlyMessage = "Network error. Please check your connection.";
+      // }
+      // setError(userFriendlyMessage);
+      // toast.error(userFriendlyMessage, { position: "top-center" });
     } finally {
       setLoading(false);
     }
