@@ -88,11 +88,6 @@ export const signin = async (req, res, next) => {
   }
 };
 
-// Function to generate a random secure password
-const generatePassword = () => {
-  return crypto.randomBytes(12).toString("hex");
-};
-
 /**
  * Google OAuth authentication controller
  * Handles user authentication via Google OAuth
