@@ -10,19 +10,27 @@ import {
 } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { app } from "../firebase"; // Make sure this path matches your firebase config file location
+import { app } from "../firebase";
+import {
+  userUpdateStart,
+  userUpdateSuccess,
+  userUpdateFailure,
+} from "../redux/user/userSlice";
 
 export default function Profile() {
   const fileRef = useRef(null);
+  const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.currentUser);
+  const { loading, error } = useSelector((state) => state.user);
+
   const [file, setFile] = useState(null);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
@@ -30,9 +38,9 @@ export default function Profile() {
     username: currentUser?.username || "",
     email: currentUser?.email || "",
     password: "",
+    avatar: currentUser?.avatar || "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,10 +48,34 @@ export default function Profile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!currentUser?._id) {
+      return toast.error("User information not loaded yet");
+    }
+
     try {
-      // Add your update profile logic here
+      dispatch(userUpdateStart());
+
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST", // Keep as POST
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (data.success === false) {
+        dispatch(userUpdateFailure(data.message));
+        return toast.error(data.message);
+      }
+
+      dispatch(userUpdateSuccess(data));
       toast.success("Profile updated successfully!");
     } catch (error) {
+      dispatch(userUpdateFailure(error.message));
       toast.error(error.message);
     }
   };
@@ -53,7 +85,6 @@ export default function Profile() {
   };
 
   const handleDeleteAccount = () => {
-    // Add delete account logic here
     toast.info("Account deletion feature coming soon");
   };
 
@@ -111,7 +142,6 @@ export default function Profile() {
               accept="image/*"
               hidden
               onChange={(e) => {
-                // Preview selected image
                 if (e.target.files && e.target.files[0]) {
                   setFile(e.target.files[0]);
                   const reader = new FileReader();
@@ -137,7 +167,7 @@ export default function Profile() {
               style={{ cursor: "pointer" }}
             />
 
-            {/* Progress bar while uploading */}
+            {/* Upload progress */}
             {filePerc > 0 && filePerc < 100 && (
               <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
                 <div
@@ -147,7 +177,6 @@ export default function Profile() {
               </div>
             )}
 
-            {/* Upload error message */}
             {fileUploadError && (
               <p className="text-red-500 text-sm mt-1">
                 Upload failed. Please try again.
@@ -204,13 +233,14 @@ export default function Profile() {
           {/* Update Button */}
           <button
             type="submit"
+            disabled={loading}
             className="w-full bg-emerald-500 hover:bg-emerald-700 text-white py-2 rounded-lg font-semibold transition duration-300"
           >
-            Update Profile
+            {loading ? "Updating..." : "Update Profile"}
           </button>
         </form>
 
-        {/* Action Buttons */}
+        {/* Actions */}
         <div className="mt-6 flex justify-between">
           <button
             onClick={handleDeleteAccount}
@@ -228,7 +258,9 @@ export default function Profile() {
           </button>
         </div>
 
-        {/* Back to Home Link */}
+        <p className="text-re-700 mg-">{error ? error : ""}</p>
+        
+        {/* Back Link */}
         <p className="text-center text-gray-600 mt-6">
           <Link to="/home" className="text-emerald-500 font-semibold">
             ← Back to Home

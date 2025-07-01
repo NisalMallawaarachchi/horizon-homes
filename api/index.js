@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser"; //for cookie parsing
 import rateLimit from "express-rate-limit";
+import cors from "cors";
 import connectDB from "./db.js";
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
@@ -16,6 +17,11 @@ connectDB();
 const app = express();
 
 // Middleware
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(cookieParser()); // Enable cookie parsing
 

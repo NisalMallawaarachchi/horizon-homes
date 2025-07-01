@@ -31,6 +31,21 @@ const userSlice = createSlice({
       state.error = action.payload; // Store error message (e.g., "Invalid password")
     },
 
+    userUpdateStart: (state) => {
+      state.loading = true; // Show loading while updating user
+      state.error = null; // Reset any previous errors
+    },
+
+    userUpdateSuccess: (state, action) => {
+      state.currentUser = action.payload; // Update the current user with new data
+      state.loading = false; // Stop loading
+      state.error = null; // Clear any previous errors
+    },
+
+    userUpdateFailure: (state, action) => {
+      state.loading = false; // Stop loading
+      state.error = action.payload; // Store error message (e.g., "Update failed")
+    },
 
     deleteUserStart: (state) => {
       state.loading = true; // Show loading while deleting user
@@ -63,7 +78,20 @@ const userSlice = createSlice({
 });
 
 // 🔹 Exporting actions so we can use them in other parts of our app
-export const { signInStart, signInSuccess, signInFailure, signOutUserStart, signOutUserFailure, signOutUserSuccess, deleteUserStart, deleteUserSuccess, deleteUserFailure } = userSlice.actions;
+export const {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+  userUpdateStart,
+  userUpdateSuccess,
+  userUpdateFailure,
+  signOutUserStart,
+  signOutUserFailure,
+  signOutUserSuccess,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+} = userSlice.actions;
 
 // 🔹 Exporting the reducer so we can add it to our Redux store
 export default userSlice.reducer;
