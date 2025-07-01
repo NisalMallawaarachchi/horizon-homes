@@ -100,6 +100,9 @@ const generatePassword = () => {
 export const googleAuth = async (req, res, next) => {
   const { name, email, photo } = req.body;
 
+//✅ Add this line here to debug the Google profile photo
+  console.log("Google photo URL:", photo);
+
   try {
     // Check if user already exists
     const existingUser = await User.findOne({ email: req.body.email });
