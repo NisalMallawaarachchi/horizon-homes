@@ -2,11 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { FaSearch, FaBars, FaTimes } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 import {
   signOutUserStart,
   signOutUserSuccess,
   signOutUserFailure,
-} from "../redux/user/userSlice"; // Adjust the path as needed
+} from "../redux/user/userSlice";
 
 export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
@@ -16,35 +17,44 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart());
+      const res = await fetch("/api/auth/signout", {
+        method: "GET",
+        credentials: "include",
+      });
 
-      const response = await fetch("/api/auth/signout");
-
-      if (!response.ok) {
-        throw new Error("Sign out failed");
+      if (!res.ok) {
+        throw new Error("Failed to sign out");
       }
 
-      const data = await response.json();
-      console.log("Sign-out response:", data);
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signOutUserFailure(data.message));
+        return toast.error(data.message);
+      }
 
       dispatch(signOutUserSuccess());
-      navigate("/signin");
+      toast.success("Signed out successfully!");
+
+      setTimeout(() => {
+        navigate("/signin");
+      }, 2500);
+      
     } catch (error) {
       dispatch(signOutUserFailure(error.message));
-      console.error("Sign out error:", error);
+      toast.error("Sign Out failed. Please try again.");
     }
   };
-  const location = useLocation();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     navigate(`/search?searchTerm=${encodeURIComponent(searchTerm)}`);
   };
 
-  // Keep search term in sync with URL
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get("searchTerm");
@@ -53,7 +63,6 @@ export default function Header() {
     }
   }, [location.search]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -68,7 +77,6 @@ export default function Header() {
     <header className="bg-emerald-100 shadow-md sticky top-0 z-30">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
         <div className="flex items-center">
-          {/* Mobile menu button */}
           <button
             className="sm:hidden p-2 mr-2"
             onClick={() => setIsOpen(!isOpen)}
@@ -77,7 +85,6 @@ export default function Header() {
             {isOpen ? <FaTimes /> : <FaBars />}
           </button>
 
-          {/* Logo */}
           <Link to="/" className="flex items-center">
             <h1 className="font-bold text-sm sm:text-xl flex flex-wrap">
               <span className="text-emerald-500">Horizon</span>
@@ -86,7 +93,6 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Search Bar */}
         <form
           onSubmit={handleSubmit}
           className="bg-white p-2 rounded-lg flex items-center shadow-sm mx-2 flex-1 max-w-md"
@@ -94,7 +100,6 @@ export default function Header() {
           <input
             type="text"
             placeholder="Search..."
-            aria-label="Search"
             className="focus:outline-none bg-transparent w-full px-2 text-slate-700"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -104,7 +109,6 @@ export default function Header() {
           </button>
         </form>
 
-        {/* Desktop Navigation */}
         <ul className="hidden sm:flex space-x-4 text-sm sm:text-base text-emerald-700 items-center">
           <li
             className={`hover:text-emerald-900 hover:underline ${
@@ -154,12 +158,12 @@ export default function Header() {
                     >
                       My Listings
                     </Link>
-                    <Link
-                      to="/signout"
-                      className="block px-4 py-2 hover:bg-emerald-50"
+                    <button
+                      onClick={handleSignOut}
+                      className="block w-full text-left px-4 py-2 hover:bg-emerald-50"
                     >
                       Sign Out
-                    </Link>
+                    </button>
                   </div>
                 )}
               </>
@@ -174,7 +178,6 @@ export default function Header() {
         </ul>
       </div>
 
-      {/* Mobile Navigation */}
       {isOpen && (
         <div className="sm:hidden absolute top-16 left-0 right-0 bg-emerald-100 p-4 shadow-md z-40">
           <ul className="flex flex-col space-y-3">
@@ -208,13 +211,15 @@ export default function Header() {
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/signout"
-                    onClick={handleSignOut}
-                    className="block py-2"
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setIsOpen(false);
+                    }}
+                    className="block w-full text-left py-2"
                   >
                     Sign Out
-                  </Link>
+                  </button>
                 </li>
               </>
             ) : (
