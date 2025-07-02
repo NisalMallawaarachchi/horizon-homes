@@ -6,6 +6,7 @@ import cors from "cors";
 import connectDB from "./db.js";
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
+import listingRouter from "./routes/listing.route.js";
 
 // Load environment variables early
 dotenv.config();
@@ -35,6 +36,7 @@ const loginLimiter = rateLimit({
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/listing", listingRouter);
 
 // Handle unknown routes
 app.use("*", (req, res) => {
