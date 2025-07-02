@@ -65,6 +65,15 @@ export default function Profile() {
         body: JSON.stringify(formData),
       });
 
+      // If not OK (like 403), throw an error early
+      if (!res.ok) {
+        const errorData = await res.json();
+        const message =
+          errorData?.message || `Request failed with status ${res.status}`;
+        dispatch(userUpdateFailure(message));
+        return toast.error(message);
+      }
+
       const data = await res.json();
 
       if (data.success === false) {
@@ -258,8 +267,12 @@ export default function Profile() {
           </button>
         </div>
 
-        <p className="text-re-700 mg-">{error ? error : ""}</p>
-        
+        {error && error.trim() !== "" && (
+          <p className="text-red-700 mt-4 text-sm text-center animate-pulse">
+            {error}
+          </p>
+        )}
+
         {/* Back Link */}
         <p className="text-center text-gray-600 mt-6">
           <Link to="/home" className="text-emerald-500 font-semibold">
