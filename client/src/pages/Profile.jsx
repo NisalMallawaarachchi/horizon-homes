@@ -26,14 +26,18 @@ import {
   deleteUserFailure,
   deleteUserStart,
   deleteUserSuccess,
+  signOutUserStart,
+  signOutUserFailure,
+  signOutUserSuccess,
 } from "../redux/user/userSlice";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const fileRef = useRef(null);
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.currentUser);
   const { loading, error } = useSelector((state) => state.user);
-
+  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
@@ -93,8 +97,40 @@ export default function Profile() {
     }
   };
 
-  const handleSignOut = () => {
-    toast.info("Sign Out feature coming soon");
+  const handleSignOut = async () => {
+    try {
+
+      dispatch(signOutUserStart());
+      // Call the signout API endpoint
+      const res = await fetch("/api/auth/signout", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to sign out");
+      }
+
+      const data = await res.json();
+
+      if (data.success === false) {
+        dispatch(signOutUserFailure(data.message));
+        return toast.error(data.message);
+      }
+
+      dispatch(signOutUserSuccess());
+      // Clear the current user from Redux state
+      toast.success("Signed out successfully!");
+
+      // Wait a moment before navigating
+      setTimeout(() => {
+        navigate("/signin"); // or wherever your login page is
+      }, 1500);
+
+    } catch (error) {
+      dispatch(signOutUserFailure(error.message));
+      toast.error("Sign Out failed. Please try again.");
+    }
   };
 
   const handleDeleteAccount = async () => {
