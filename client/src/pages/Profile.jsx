@@ -23,6 +23,9 @@ import {
   userUpdateStart,
   userUpdateSuccess,
   userUpdateFailure,
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
 } from "../redux/user/userSlice";
 
 export default function Profile() {
@@ -41,6 +44,7 @@ export default function Profile() {
     avatar: currentUser?.avatar || "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -93,8 +97,27 @@ export default function Profile() {
     toast.info("Sign Out feature coming soon");
   };
 
-  const handleDeleteAccount = () => {
-    toast.info("Account deletion feature coming soon");
+  const handleDeleteAccount = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to delete account");
+      }
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return toast.error(data.message);
+      }
+      dispatch(deleteUserSuccess());
+      toast.success("Account deleted successfully!");
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+      toast.error("Account deletion failed. Please try again.");
+    }
   };
 
   useEffect(() => {
@@ -258,7 +281,7 @@ export default function Profile() {
             <FaTrash className="mr-2" />
             Delete Account
           </button>
-          
+
           <button
             onClick={handleSignOut}
             className="flex items-center text-emerald-500 hover:text-emerald-700 font-medium"
