@@ -82,7 +82,7 @@ export const signin = async (req, res, next) => {
     });
 
     // Return token and user data (without password)
-    res.status(200).json({ token, user: rest });
+    res.status(200).json(rest);
   } catch (error) {
     next(error);
   }
