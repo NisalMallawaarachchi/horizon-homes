@@ -258,6 +258,7 @@ export default function Profile() {
             <FaTrash className="mr-2" />
             Delete Account
           </button>
+          
           <button
             onClick={handleSignOut}
             className="flex items-center text-emerald-500 hover:text-emerald-700 font-medium"
