@@ -17,12 +17,14 @@ export default function CreateListing() {
   const [formData, setFormData] = useState({
     imageUrls: [],
   });
+  const [imageUploadError, setImageUploadError] = useState(null);
 
+  console.log("formData", formData);
   const handleImageUpload = async (e) => {
     e.preventDefault();
 
-    if (!files.length || files.length > 6) {
-      alert("Please select between 1 and 6 images.");
+    if (!files.length || files.length + formData.imageUrls.length > 6) {
+      toast.error("Please select between 1 and 6 images.");
       return;
     }
 
@@ -41,7 +43,11 @@ export default function CreateListing() {
         imageUrls: [...prev.imageUrls, ...urls],
       }));
       toast.success("Images uploaded successfully!");
+
+      setImageUploadError(false);
     } catch (error) {
+      setImageUploadError("Image upload failed: " + error.message);
+      console.error("Image upload faied (2MB max per image)");
       toast.error("Image upload failed: " + error.message);
     } finally {
       setUploading(false);
@@ -80,7 +86,7 @@ export default function CreateListing() {
 
   return (
     <main className="p-6 max-w-5xl mx-auto bg-white rounded-2xl shadow-lg">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-center"/>
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold text-slate-800">Create a Listing</h1>
         <p className="mt-2 text-slate-500">
@@ -255,6 +261,10 @@ export default function CreateListing() {
               </div>
             )}
           </div>
+
+          {imageUploadError && (
+            <p className="text-red-500 text-sm mt-1">{imageUploadError}</p>
+          )}
 
           {/* Uploaded Images Preview */}
           {formData.imageUrls.map((url, index) => (
