@@ -1,8 +1,86 @@
 import { FaUpload, FaTrashAlt } from "react-icons/fa";
+import { useState } from "react";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { app } from "../firebase";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function CreateListing() {
+  const [files, setFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [formData, setFormData] = useState({
+    imageUrls: [],
+  });
+
+  const handleImageUpload = async (e) => {
+    e.preventDefault();
+
+    if (!files.length || files.length > 6) {
+      alert("Please select between 1 and 6 images.");
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+    const promises = [];
+
+    for (let i = 0; i < files.length; i++) {
+      promises.push(storeImage(files[i]));
+    }
+
+    try {
+      const urls = await Promise.all(promises);
+      setFormData((prev) => ({
+        ...prev,
+        imageUrls: [...prev.imageUrls, ...urls],
+      }));
+      toast.success("Images uploaded successfully!");
+    } catch (error) {
+      toast.error("Image upload failed: " + error.message);
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const storeImage = async (file) => {
+    return new Promise((resolve, reject) => {
+      const storage = getStorage(app);
+      const fileName = new Date().getTime() + file.name;
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(Math.round(progress));
+        },
+        (error) => reject(error),
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then(resolve);
+        }
+      );
+    });
+  };
+
+  const handleDeleteImage = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      imageUrls: prev.imageUrls.filter((_, i) => i !== index),
+    }));
+  };
+
   return (
     <main className="p-6 max-w-5xl mx-auto bg-white rounded-2xl shadow-lg">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold text-slate-800">Create a Listing</h1>
         <p className="mt-2 text-slate-500">
@@ -13,92 +91,100 @@ export default function CreateListing() {
       <form className="flex flex-col sm:flex-row gap-8">
         {/* Left Section */}
         <div className="flex flex-col gap-6 flex-1">
-          {/* Name */}
           <div className="space-y-2">
-            <label htmlFor="name" className="block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-slate-700"
+            >
               Listing Name
             </label>
             <input
               type="text"
+              id="name"
+              required
               placeholder="Beautiful modern apartment in downtown"
               className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
-              id="name"
-              minLength="10"
-              required
             />
           </div>
 
-          {/* Description */}
           <div className="space-y-2">
-            <label htmlFor="Description" className="block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="Description"
+              className="block text-sm font-medium text-slate-700"
+            >
               Description
             </label>
             <textarea
-              placeholder="Describe your property in detail..."
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl resize-none h-28 focus:outline-none focus:ring-2 focus:ring-slate-500"
               id="Description"
               required
+              placeholder="Describe your property in detail..."
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl resize-none h-28 focus:outline-none focus:ring-2 focus:ring-slate-500"
             />
           </div>
 
-          {/* Address */}
           <div className="space-y-2">
-            <label htmlFor="Address" className="block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="Address"
+              className="block text-sm font-medium text-slate-700"
+            >
               Address
             </label>
             <input
               type="text"
-              placeholder="123 Main St, City, Country"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
               id="Address"
               required
+              placeholder="123 Main St, City, Country"
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
             />
           </div>
 
-          {/* Listing Options */}
           <div className="space-y-2">
-            <p className="text-sm font-medium text-slate-700">Listing Options</p>
+            <p className="text-sm font-medium text-slate-700">
+              Listing Options
+            </p>
             <div className="flex flex-wrap gap-4">
-              {[
-                { id: "sale", label: "Sell" },
-                { id: "rent", label: "Rent" },
-                { id: "parking", label: "Parking spot" },
-                { id: "furnished", label: "Furnished" },
-                { id: "offer", label: "Offer" },
-              ].map(({ id, label }) => (
-                <label key={id} className="flex items-center gap-2 cursor-pointer">
+              {["sale", "rent", "parking", "furnished", "offer"].map((id) => (
+                <label
+                  key={id}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
                   <input
                     type="checkbox"
-                    className="w-5 h-5 text-slate-600 rounded border-slate-300"
                     id={id}
+                    className="w-5 h-5 text-slate-600 border-slate-300"
                   />
-                  <span className="text-slate-700 text-sm">{label}</span>
+                  <span className="text-slate-700 text-sm capitalize">
+                    {id}
+                  </span>
                 </label>
               ))}
             </div>
           </div>
 
-          {/* Property Details */}
           <div className="space-y-2">
-            <p className="text-sm font-medium text-slate-700">Property Details</p>
+            <p className="text-sm font-medium text-slate-700">
+              Property Details
+            </p>
             <div className="flex flex-wrap gap-6">
-              {[{ id: "bedrooms", label: "Bedrooms" }, { id: "bathrooms", label: "Bathrooms" }].map(
-                ({ id, label }) => (
-                  <div key={id} className="flex items-center gap-3">
-                    <input
-                      type="number"
-                      className="px-4 py-2.5 w-20 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
-                      id={id}
-                      min="1"
-                      max="10"
-                      required
-                    />
-                    <label htmlFor={id} className="text-slate-700 text-sm">{label}</label>
-                  </div>
-                )
-              )}
+              {[
+                { id: "bedrooms", label: "Bedrooms" },
+                { id: "bathrooms", label: "Bathrooms" },
+              ].map(({ id, label }) => (
+                <div key={id} className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    id={id}
+                    required
+                    min="1"
+                    max="10"
+                    className="px-4 py-2.5 w-20 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
+                  />
+                  <label htmlFor={id} className="text-slate-700 text-sm">
+                    {label}
+                  </label>
+                </div>
+              ))}
 
-              {/* Prices */}
               {[
                 { id: "regularPrice", label: "Regular price" },
                 { id: "discountedPrice", label: "Discounted price" },
@@ -106,14 +192,16 @@ export default function CreateListing() {
                 <div key={id} className="flex items-center gap-3">
                   <input
                     type="number"
-                    className="px-4 py-2.5 w-28 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
                     id={id}
+                    required
                     min="1"
                     max="1000000"
-                    required
+                    className="px-4 py-2.5 w-28 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
                   />
                   <div className="flex flex-col">
-                    <label htmlFor={id} className="text-slate-700 text-sm">{label}</label>
+                    <label htmlFor={id} className="text-slate-700 text-sm">
+                      {label}
+                    </label>
                     <span className="text-xs text-slate-500">($ / month)</span>
                   </div>
                 </div>
@@ -124,7 +212,6 @@ export default function CreateListing() {
 
         {/* Right Section */}
         <div className="flex flex-col flex-1 gap-6">
-          {/* Image Upload */}
           <div className="space-y-2">
             <div className="flex justify-between">
               <label className="text-sm font-medium text-slate-700">
@@ -135,45 +222,68 @@ export default function CreateListing() {
               </span>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <input
+                onChange={(e) => setFiles(e.target.files)}
                 className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                id="images"
                 type="file"
                 accept="image/*"
                 multiple
               />
               <button
+                onClick={handleImageUpload}
                 type="button"
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-800 transition duration-200 flex items-center gap-2"
+                disabled={uploading}
+                className={`px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm flex items-center gap-2 ${
+                  uploading
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-emerald-800"
+                } transition duration-200`}
               >
-                <FaUpload className="text-base" /> Upload
+                <FaUpload className="text-base" />
+                {uploading ? "Uploading..." : "Upload"}
               </button>
             </div>
+
+            {/* Progress Bar */}
+            {uploading && (
+              <div className="w-full bg-slate-200 rounded-full h-2 mt-2">
+                <div
+                  className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+            )}
           </div>
 
-          {/* Image Preview */}
-          <div className="border border-slate-200 rounded-xl p-4">
-            <div className="flex justify-between items-center">
+          {/* Uploaded Images Preview */}
+          {formData.imageUrls.map((url, index) => (
+            <div
+              key={index}
+              className="flex justify-between items-center border border-slate-200 rounded-xl p-4"
+            >
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 rounded-lg bg-slate-100 overflow-hidden">
-                  <img src="#" alt="listing image" className="w-full h-full object-cover" />
+                  <img
+                    src={url}
+                    alt={`Image ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-700">image.jpg</p>
-                  <p className="text-xs text-slate-500">2.4 MB</p>
-                </div>
+                <p className="text-sm font-medium text-slate-700">
+                  {`Image ${index + 1}`}
+                </p>
               </div>
               <button
                 type="button"
+                onClick={() => handleDeleteImage(index)}
                 className="p-2 text-red-600 hover:text-red-800 transition duration-200 rounded-full hover:bg-red-100"
               >
                 <FaTrashAlt className="w-4 h-4" />
               </button>
             </div>
-          </div>
+          ))}
 
-          {/* Submit Button */}
           <button
             className="mt-2 px-5 py-3 bg-slate-700 text-white rounded-xl uppercase text-sm font-semibold hover:bg-slate-800 transition duration-200 shadow-sm flex items-center justify-center gap-2"
             type="submit"
