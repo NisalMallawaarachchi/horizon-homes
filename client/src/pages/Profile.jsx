@@ -48,7 +48,6 @@ export default function Profile() {
     avatar: currentUser?.avatar || "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -99,7 +98,6 @@ export default function Profile() {
 
   const handleSignOut = async () => {
     try {
-
       dispatch(signOutUserStart());
       // Call the signout API endpoint
       const res = await fetch("/api/auth/signout", {
@@ -126,7 +124,6 @@ export default function Profile() {
       setTimeout(() => {
         navigate("/signin"); // or wherever your login page is
       }, 1500);
-
     } catch (error) {
       dispatch(signOutUserFailure(error.message));
       toast.error("Sign Out failed. Please try again.");
@@ -306,6 +303,13 @@ export default function Profile() {
           >
             {loading ? "Updating..." : "Update Profile"}
           </button>
+
+          <Link
+            to="/create-listing"
+            className="w-full block text-center bg-gray-700 hover:bg-gray-800 text-white py-2 rounded-lg font-semibold transition duration-300 mt-2"
+          >
+            Create Listing
+          </Link>
         </form>
 
         {/* Actions */}
