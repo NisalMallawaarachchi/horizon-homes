@@ -96,17 +96,32 @@ export default function CreateListing() {
   };
 
   const handleChange = (e) => {
-    if(e.target.id === "sale" || e.target.id === "rent") {
+    if (e.target.id === "sale" || e.target.id === "rent") {
       setFormData((prev) => ({
         ...prev,
         type: e.target.id,
       }));
     }
 
-    if (e.target.id === "parking" || e.target.id === "furnished" || e.target.id === "offer") {
+    if (
+      e.target.id === "parking" ||
+      e.target.id === "furnished" ||
+      e.target.id === "offer"
+    ) {
       setFormData((prev) => ({
         ...prev,
         [e.target.id]: e.target.checked,
+      }));
+    }
+
+    if (
+      e.target.type === "number" ||
+      e.target.type === "text" ||
+      e.target.type === "textarea"
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        [e.target.id]: e.target.value,
       }));
     }
   };
