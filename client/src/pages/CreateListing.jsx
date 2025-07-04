@@ -16,6 +16,17 @@ export default function CreateListing() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [formData, setFormData] = useState({
     imageUrls: [],
+    name: "",
+    description: "",
+    address: "",
+    type: "sale",
+    bedrooms: 1,
+    bathrooms: 1,
+    regularPrice: 0,
+    discountedPrice: 0,
+    offer: false,
+    furnished: false,
+    parking: false,
   });
   const [imageUploadError, setImageUploadError] = useState(null);
 
@@ -84,9 +95,18 @@ export default function CreateListing() {
     }));
   };
 
+  const handleChange = (e) => {
+    if(e.target.id === "sale" || e.target.id === "rent") {
+      setFormData((prev) => ({
+        ...prev,
+        type: e.target.id,
+      }));
+    }
+  };
+
   return (
     <main className="p-6 max-w-5xl mx-auto bg-white rounded-2xl shadow-lg">
-      <ToastContainer position="top-center"/>
+      <ToastContainer position="top-center" />
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold text-slate-800">Create a Listing</h1>
         <p className="mt-2 text-slate-500">
@@ -110,6 +130,8 @@ export default function CreateListing() {
               required
               placeholder="Beautiful modern apartment in downtown"
               className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
+              onChange={handleChange}
+              value={formData.name}
             />
           </div>
 
@@ -121,10 +143,12 @@ export default function CreateListing() {
               Description
             </label>
             <textarea
-              id="Description"
+              id="description"
               required
               placeholder="Describe your property in detail..."
               className="w-full px-4 py-2.5 border border-slate-200 rounded-xl resize-none h-28 focus:outline-none focus:ring-2 focus:ring-slate-500"
+              onChange={handleChange}
+              value={formData.description}
             />
           </div>
 
@@ -137,10 +161,12 @@ export default function CreateListing() {
             </label>
             <input
               type="text"
-              id="Address"
+              id="address"
               required
               placeholder="123 Main St, City, Country"
               className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
+              onChange={handleChange}
+              value={formData.address}
             />
           </div>
 
@@ -158,6 +184,12 @@ export default function CreateListing() {
                     type="checkbox"
                     id={id}
                     className="w-5 h-5 text-slate-600 border-slate-300"
+                    onChange={handleChange}
+                    checked={
+                      id === "sale" || id === "rent"
+                        ? formData.type === id
+                        : formData[id]
+                    }
                   />
                   <span className="text-slate-700 text-sm capitalize">
                     {id}
@@ -184,6 +216,8 @@ export default function CreateListing() {
                     min="1"
                     max="10"
                     className="px-4 py-2.5 w-20 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    onChange={handleChange}
+                    value={formData[id]}
                   />
                   <label htmlFor={id} className="text-slate-700 text-sm">
                     {label}
@@ -203,6 +237,8 @@ export default function CreateListing() {
                     min="1"
                     max="1000000"
                     className="px-4 py-2.5 w-28 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    onChange={handleChange}
+                    value={formData[id]}
                   />
                   <div className="flex flex-col">
                     <label htmlFor={id} className="text-slate-700 text-sm">
