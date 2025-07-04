@@ -102,6 +102,13 @@ export default function CreateListing() {
         type: e.target.id,
       }));
     }
+
+    if (e.target.id === "parking" || e.target.id === "furnished" || e.target.id === "offer") {
+      setFormData((prev) => ({
+        ...prev,
+        [e.target.id]: e.target.checked,
+      }));
+    }
   };
 
   return (
