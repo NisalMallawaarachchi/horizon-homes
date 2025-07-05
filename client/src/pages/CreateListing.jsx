@@ -130,51 +130,54 @@ export default function CreateListing() {
     }
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    if (formData.offer && +formData.regularPrice <= +formData.discountedPrice) {
-      throw new Error("Regular price must be greater than discounted price");
+    try {
+      if (
+        formData.offer &&
+        +formData.regularPrice <= +formData.discountedPrice
+      ) {
+        throw new Error("Regular price must be greater than discounted price");
+      }
+
+      setLoading(true);
+      setError(false);
+
+      const listingData = {
+        ...formData,
+        userRef: currentUser._id,
+      };
+
+      // Only include discountedPrice if offer is true
+      if (!formData.offer) {
+        delete listingData.discountedPrice;
+      }
+
+      const res = await fetch("/api/listing/create", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+        body: JSON.stringify(listingData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.success === false) {
+        throw new Error(data.message || "Failed to create listing");
+      }
+
+      setLoading(false);
+      toast.success("Listing created successfully!");
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+      console.error("Error creating listing:", error);
     }
-    
-    setLoading(true);
-    setError(false);
-
-    const listingData = {
-      ...formData,
-      userRef: currentUser._id,
-    };
-
-    // Only include discountedPrice if offer is true
-    if (!formData.offer) {
-      delete listingData.discountedPrice;
-    }
-
-    const res = await fetch("/api/listing/create", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${currentUser.token}`,
-      },
-      body: JSON.stringify(listingData),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || data.success === false) {
-      throw new Error(data.message || "Failed to create listing");
-    }
-
-    setLoading(false);
-    toast.success("Listing created successfully!");
-  } catch (error) {
-    setError(error.message);
-    setLoading(false);
-    console.error("Error creating listing:", error);
-  }
-};
+  };
 
   return (
     <main className="p-6 max-w-5xl mx-auto bg-white rounded-2xl shadow-lg">
@@ -427,11 +430,15 @@ export default function CreateListing() {
           ))}
 
           <button
-            className="mt-2 px-5 py-3 bg-slate-700 text-white rounded-xl uppercase text-sm font-semibold hover:bg-slate-800 transition duration-200 shadow-sm flex items-center justify-center gap-2"
+            className="mt-2 px-5 py-3 bg-slate-700 text-white rounded-xl uppercase text-sm font-semibold transition duration-200 shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             type="submit"
+            disabled={loading || uploading}
           >
-            {loading ? "Creating..." : "Create Listing"}
+            {loading
+              ? "Creating..."
+              : "Create Listing"}
           </button>
+
           {error && <p className="text-red-700 text-sm">{error}</p>}
         </div>
       </form>
