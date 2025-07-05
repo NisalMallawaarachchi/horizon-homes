@@ -130,41 +130,51 @@ export default function CreateListing() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      
-      setLoading(true);
-      setError(false);
-
-      const res = await fetch("/api/listing/create", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${currentUser.token}`,
-        },
-        body: JSON.stringify({
-          ...formData,
-          userRef: currentUser._id,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || data.success === false) {
-        throw new Error(data.message || "Failed to create listing");
-      }
-
-      setLoading(false);
-      toast.success("Listing created successfully!");
-    } catch (error) {
-      setError(error.message);
-      setLoading(false);
-      console.error("Error creating listing:", error);
+  try {
+    if (formData.offer && +formData.regularPrice <= +formData.discountedPrice) {
+      throw new Error("Regular price must be greater than discounted price");
     }
-  };
+    
+    setLoading(true);
+    setError(false);
+
+    const listingData = {
+      ...formData,
+      userRef: currentUser._id,
+    };
+
+    // Only include discountedPrice if offer is true
+    if (!formData.offer) {
+      delete listingData.discountedPrice;
+    }
+
+    const res = await fetch("/api/listing/create", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${currentUser.token}`,
+      },
+      body: JSON.stringify(listingData),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.success === false) {
+      throw new Error(data.message || "Failed to create listing");
+    }
+
+    setLoading(false);
+    toast.success("Listing created successfully!");
+  } catch (error) {
+    setError(error.message);
+    setLoading(false);
+    console.error("Error creating listing:", error);
+  }
+};
 
   return (
     <main className="p-6 max-w-5xl mx-auto bg-white rounded-2xl shadow-lg">
@@ -287,29 +297,53 @@ export default function CreateListing() {
                 </div>
               ))}
 
-              {[
-                { id: "regularPrice", label: "Regular price" },
-                { id: "discountedPrice", label: "Discounted price" },
-              ].map(({ id, label }) => (
-                <div key={id} className="flex items-center gap-3">
+              {/* Regular Price - always shown */}
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  id="regularPrice"
+                  required
+                  min="1"
+                  max="1000000"
+                  className="px-4 py-2.5 w-28 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
+                  onChange={handleChange}
+                  value={formData.regularPrice}
+                />
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="regularPrice"
+                    className="text-slate-700 text-sm"
+                  >
+                    Regular price
+                  </label>
+                  <span className="text-xs text-slate-500">($ / month)</span>
+                </div>
+              </div>
+
+              {/* Discounted Price - shown only if offer is checked */}
+              {formData.offer && (
+                <div className="flex items-center gap-3">
                   <input
                     type="number"
-                    id={id}
-                    required
-                    min="1"
-                    max="1000000"
+                    id="discountedPrice"
+                    required={formData.offer}
+                    min="0"
+                    max={formData.regularPrice - 1 || 1000000}
                     className="px-4 py-2.5 w-28 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500"
                     onChange={handleChange}
-                    value={formData[id]}
+                    value={formData.discountedPrice}
                   />
                   <div className="flex flex-col">
-                    <label htmlFor={id} className="text-slate-700 text-sm">
-                      {label}
+                    <label
+                      htmlFor="discountedPrice"
+                      className="text-slate-700 text-sm"
+                    >
+                      Discounted price
                     </label>
                     <span className="text-xs text-slate-500">($ / month)</span>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
