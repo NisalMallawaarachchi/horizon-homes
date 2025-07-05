@@ -10,9 +10,11 @@ import { app } from "../firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
+  const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -172,6 +174,11 @@ export default function CreateListing() {
 
       setLoading(false);
       toast.success("Listing created successfully!");
+
+      setTimeout(() => {
+        navigate(`/listing/${data._id}`);
+      }, 2000);
+      
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -434,9 +441,7 @@ export default function CreateListing() {
             type="submit"
             disabled={loading || uploading}
           >
-            {loading
-              ? "Creating..."
-              : "Create Listing"}
+            {loading ? "Creating..." : "Create Listing"}
           </button>
 
           {error && <p className="text-red-700 text-sm">{error}</p>}
