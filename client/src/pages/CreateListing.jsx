@@ -9,17 +9,21 @@ import {
 import { app } from "../firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
 
 export default function CreateListing() {
+  const { currentUser } = useSelector((state) => state.user);
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     imageUrls: [],
     name: "",
     description: "",
     address: "",
-    type: "sale",
+    type: "",
     bedrooms: 1,
     bathrooms: 1,
     regularPrice: 0,
@@ -58,7 +62,7 @@ export default function CreateListing() {
       setImageUploadError(false);
     } catch (error) {
       setImageUploadError("Image upload failed: " + error.message);
-      console.error("Image upload faied (2MB max per image)");
+      console.error("Image upload failed (2MB max per image)");
       toast.error("Image upload failed: " + error.message);
     } finally {
       setUploading(false);
@@ -126,6 +130,42 @@ export default function CreateListing() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      
+      setLoading(true);
+      setError(false);
+
+      const res = await fetch("/api/listing/create", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+        body: JSON.stringify({
+          ...formData,
+          userRef: currentUser._id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.success === false) {
+        throw new Error(data.message || "Failed to create listing");
+      }
+
+      setLoading(false);
+      toast.success("Listing created successfully!");
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+      console.error("Error creating listing:", error);
+    }
+  };
+
   return (
     <main className="p-6 max-w-5xl mx-auto bg-white rounded-2xl shadow-lg">
       <ToastContainer position="top-center" />
@@ -136,7 +176,7 @@ export default function CreateListing() {
         </p>
       </div>
 
-      <form className="flex flex-col sm:flex-row gap-8">
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-8">
         {/* Left Section */}
         <div className="flex flex-col gap-6 flex-1">
           <div className="space-y-2">
@@ -356,8 +396,9 @@ export default function CreateListing() {
             className="mt-2 px-5 py-3 bg-slate-700 text-white rounded-xl uppercase text-sm font-semibold hover:bg-slate-800 transition duration-200 shadow-sm flex items-center justify-center gap-2"
             type="submit"
           >
-            Create Listing
+            {loading ? "Creating..." : "Create Listing"}
           </button>
+          {error && <p className="text-red-700 text-sm">{error}</p>}
         </div>
       </form>
     </main>
