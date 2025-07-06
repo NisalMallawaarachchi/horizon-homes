@@ -306,7 +306,7 @@ export default function Profile() {
 
           <Link
             to="/create-listing"
-            className="w-full block text-center bg-gray-700 hover:bg-gray-800 text-white py-2 rounded-lg font-semibold transition duration-300 mt-2"
+            className="w-full block text-center bg-slate-700 hover:bg-slate-800 text-white py-2 rounded-lg font-semibold transition duration-300 mt-2"
           >
             Create Listing
           </Link>
@@ -339,15 +339,18 @@ export default function Profile() {
 
         {/* Back Link */}
         <p className="text-center text-gray-600 mt-6">
-          <Link to="/home" className="text-emerald-500 font-semibold">
-            ← Back to Home
+          <Link
+            to="/my-listings"
+            className="w-full block text-center bg-slate-700 hover:bg-slate-800 text-white py-2 rounded-lg font-semibold transition duration-300 mt-2"
+          >
+            Show My Listings
           </Link>
 
           <Link
-            to="/my-listings"
-            className="w-full block text-center bg-slate-600 hover:bg-slate-700 text-white py-2 rounded-lg font-semibold transition duration-300 mt-2"
+            to="/home"
+            className="block text-emerald-500 hover:text-emerald-700 font-semibold mt-2"
           >
-            Show My Listings
+            ← Back to Home
           </Link>
         </p>
       </div>
