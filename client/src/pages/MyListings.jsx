@@ -3,10 +3,12 @@ import { useSelector } from "react-redux";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 export default function MyListings() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.currentUser);
   const userId = currentUser?._id;
 
@@ -67,7 +69,9 @@ export default function MyListings() {
               key={listing._id}
               className="border rounded-xl overflow-hidden shadow hover:shadow-lg transition flex flex-col h-full"
             >
-              <div className="relative pb-[60%]"> {/* This maintains a 3:2 aspect ratio */}
+              <div className="relative pb-[60%]">
+                {" "}
+                {/* This maintains a 3:2 aspect ratio */}
                 <img
                   src={listing.imageUrls[0]}
                   alt={listing.name}
@@ -91,7 +95,7 @@ export default function MyListings() {
                     <FaTrash />
                   </button>
                   <button
-                    onClick={() => alert("Edit functionality coming soon!")}
+                    onClick={() => navigate(`/update-listing/${listing._id}`)}
                     className="text-emerald-500 hover:text-emerald-700"
                     title="Edit"
                   >
