@@ -153,7 +153,7 @@ export default function Header() {
                       Profile
                     </Link>
                     <Link
-                      to="/listings"
+                      to="/my-listings"
                       className="block px-4 py-2 hover:bg-emerald-50"
                     >
                       My Listings

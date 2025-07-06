@@ -342,6 +342,13 @@ export default function Profile() {
           <Link to="/home" className="text-emerald-500 font-semibold">
             ← Back to Home
           </Link>
+
+          <Link
+            to="/my-listings"
+            className="w-full block text-center bg-slate-600 hover:bg-slate-700 text-white py-2 rounded-lg font-semibold transition duration-300 mt-2"
+          >
+            Show My Listings
+          </Link>
         </p>
       </div>
     </div>
