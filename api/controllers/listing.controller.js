@@ -36,3 +36,34 @@ export const deleteListing = async (req, res, next) => {
     return next(error);
   }
 };
+
+export const updateListing = async (req, res, next) => {
+  let listing;
+
+  try {
+    listing = await Listing.findById(req.params.id);
+  } catch (error) {
+    return next(errorHandler("Invalid listing ID", 400));
+  }
+
+  if (!listing) {
+    return next(errorHandler("Listing not found", 404));
+  }
+
+  if (req.user._id !== listing.userRef.toString()) {
+    return next(
+      errorHandler("You are not authorized to update this listing", 403)
+    );
+  }
+
+  try {
+    const updatedListing = await Listing.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    return res.status(200).json(updatedListing);
+  } catch (error) {
+    return next(error);
+  }
+};
