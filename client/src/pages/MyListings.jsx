@@ -82,8 +82,20 @@ export default function MyListings() {
                 <h3 className="text-lg font-semibold">{listing.name}</h3>
                 <p className="text-sm text-gray-600">{listing.address}</p>
                 <p className="text-sm text-emerald-600 font-bold">
-                  $
-                  {listing.offer ? listing.discountPrice : listing.regularPrice}
+                  {listing.offer ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-red-500 line-through">
+                        ${listing.regularPrice}
+                      </span>
+                      <span className="text-md text-emerald-600 font-bold">
+                        ${listing.discountedPrice}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-md text-slate-800 font-bold">
+                      ${listing.regularPrice}
+                    </span>
+                  )}
                 </p>
 
                 <div className="flex justify-end mt-3 gap-3">
