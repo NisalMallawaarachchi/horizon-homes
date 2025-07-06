@@ -67,53 +67,64 @@ export default function MyListings() {
           {listings.map((listing) => (
             <div
               key={listing._id}
-              className="border rounded-xl overflow-hidden shadow hover:shadow-lg transition flex flex-col h-full"
+              className="border rounded-xl overflow-hidden shadow hover:shadow-lg transition flex flex-col h-full relative" // Added relative here
             >
-              <div className="relative pb-[60%]">
-                {" "}
-                {/* This maintains a 3:2 aspect ratio */}
-                <img
-                  src={listing.imageUrls[0]}
-                  alt={listing.name}
-                  className="absolute w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-4 space-y-1 flex-grow">
-                <h3 className="text-lg font-semibold">{listing.name}</h3>
-                <p className="text-sm text-gray-600">{listing.address}</p>
-                <p className="text-sm text-emerald-600 font-bold">
-                  {listing.offer ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-red-500 line-through">
+              {/* Clickable area covering the image and text */}
+              <div
+                className="cursor-pointer"
+                onClick={() => navigate(`/listing/${listing._id}`)}
+              >
+                <div className="relative pb-[60%]">
+                  <img
+                    src={listing.imageUrls[0]}
+                    alt={listing.name}
+                    className="absolute w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4 space-y-1 flex-grow">
+                  <h3 className="text-lg font-semibold">{listing.name}</h3>
+                  <p className="text-sm text-gray-600">{listing.address}</p>
+                  <p className="text-sm text-emerald-600 font-bold">
+                    {listing.offer ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-red-500 line-through">
+                          ${listing.regularPrice}
+                        </span>
+                        <span className="text-md text-emerald-600 font-bold">
+                          ${listing.discountedPrice}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-md text-slate-800 font-bold">
                         ${listing.regularPrice}
                       </span>
-                      <span className="text-md text-emerald-600 font-bold">
-                        ${listing.discountedPrice}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-md text-slate-800 font-bold">
-                      ${listing.regularPrice}
-                    </span>
-                  )}
-                </p>
-
-                <div className="flex justify-end mt-3 gap-3">
-                  <button
-                    onClick={() => handleDelete(listing._id)}
-                    className="text-red-600 hover:text-red-800"
-                    title="Delete"
-                  >
-                    <FaTrash />
-                  </button>
-                  <button
-                    onClick={() => navigate(`/update-listing/${listing._id}`)}
-                    className="text-emerald-500 hover:text-emerald-700"
-                    title="Edit"
-                  >
-                    <FaEdit />
-                  </button>
+                    )}
+                  </p>
                 </div>
+              </div>
+
+              {/* Buttons - not part of the clickable area */}
+              <div className="flex justify-end mt-3 gap-3 p-4">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(listing._id);
+                  }}
+                  className="text-red-600 hover:text-red-800"
+                  title="Delete"
+                >
+                  <FaTrash />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/update-listing/${listing._id}`);
+                  }}
+                  className="text-emerald-500 hover:text-emerald-700"
+                  title="Edit"
+                >
+                  <FaEdit />
+                </button>
               </div>
             </div>
           ))}

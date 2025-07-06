@@ -3,7 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { FaBed, FaBath, FaParking, FaChair } from "react-icons/fa";
+import {
+  FaBed,
+  FaBath,
+  FaParking,
+  FaChair,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 import { IoIosArrowBack } from "react-icons/io";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -44,12 +50,6 @@ export default function Listing() {
     try {
       setContactLoading(true);
       // Implement your contact logic here
-      // For example:
-      // const res = await fetch(`/api/contact/${listing.userRef}`, {
-      //   method: "POST",
-      //   credentials: "include"
-      // });
-      // const data = await res.json();
       toast.success("Contact request sent successfully!");
     } catch (error) {
       toast.error("Failed to send contact request");
@@ -90,7 +90,8 @@ export default function Listing() {
           Listing Not Found
         </h2>
         <p className="text-gray-600 mb-4">
-          The listing you sre looking for does nott exist or may have been removed.
+          The listing you're looking for does not exist or may have been
+          removed.
         </p>
         <button
           onClick={() => navigate("/")}
@@ -106,7 +107,7 @@ export default function Listing() {
     <div className="max-w-4xl mx-auto p-4 sm:p-6">
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center text-blue-600 mb-4 hover:text-blue-800 transition"
+        className="flex items-center text-slate-600 mb-4 hover:text-slate-900 transition"
       >
         <IoIosArrowBack className="mr-1" /> Back to results
       </button>
@@ -138,7 +139,7 @@ export default function Listing() {
                 ${listing.regularPrice.toLocaleString()}
               </span>
               ${listing.discountedPrice.toLocaleString()}
-              <span className="ml-2 text-emerald-600 text-sm font-normal">
+              <span className="ml-2 text-emerald-600 text-sm font-bold">
                 (
                 {Math.round(
                   100 - (listing.discountedPrice / listing.regularPrice) * 100
@@ -155,30 +156,37 @@ export default function Listing() {
         </p>
       </div>
 
+      {/* Property Type Badge */}
+      <div className="mb-4">
+        <span className="inline-block bg-red-200 text-red-800 text-sm font-medium px-2.5 py-0.5 rounded">
+          {listing.type === "rent" ? "For Rent" : "For Sale"}
+        </span>
+      </div>
+
       {/* Property Details */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="flex items-center bg-gray-100 p-3 rounded-lg">
-          <FaBed className="text-gray-700 mr-2" />
-          <span>
+          <FaBed className="text-emerald-700 mr-2" />
+          <span className="text-emerald-700">
             {listing.bedrooms} {listing.bedrooms > 1 ? "Beds" : "Bed"}
           </span>
         </div>
         <div className="flex items-center bg-gray-100 p-3 rounded-lg">
-          <FaBath className="text-gray-700 mr-2" />
-          <span>
+          <FaBath className="text-emerald-700 mr-2" />
+          <span className="text-emerald-700">
             {listing.bathrooms} {listing.bathrooms > 1 ? "Baths" : "Bath"}
           </span>
         </div>
         {listing.parking && (
           <div className="flex items-center bg-gray-100 p-3 rounded-lg">
-            <FaParking className="text-gray-700 mr-2" />
-            <span>Parking</span>
+            <FaParking className="text-emerald-700 mr-2" />
+            <span className="text-emerald-700">Parking</span>
           </div>
         )}
         {listing.furnished && (
           <div className="flex items-center bg-gray-100 p-3 rounded-lg">
-            <FaChair className="text-gray-700 mr-2" />
-            <span>Furnished</span>
+            <FaChair className="text-emerald-700 mr-2" />
+            <span className="text-emerald-700">Furnished</span>
           </div>
         )}
       </div>
@@ -191,17 +199,20 @@ export default function Listing() {
         </p>
       </div>
 
-      {/* Address */}
+      {/* Address with Location Icon */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Location</h2>
-        <p className="text-gray-700">{listing.address}</p>
+        <div className="flex items-start">
+          <FaMapMarkerAlt className="text-red-500 mt-1 mr-2 flex-shrink-0" />
+          <p className="text-gray-700">{listing.address}</p>
+        </div>
       </div>
 
       {/* Contact Button */}
       <button
         onClick={handleContactOwner}
         disabled={contactLoading}
-        className={`w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition ${
+        className={`w-full py-3 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-medium hover:bg-blue-700 transition ${
           contactLoading ? "opacity-70 cursor-not-allowed" : ""
         }`}
       >
