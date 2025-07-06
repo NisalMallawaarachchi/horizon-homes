@@ -1,3 +1,4 @@
+import e from "express";
 import Listing from "../models/listing.model.js";
 import { errorHandler } from "../utils/error.js";
 
@@ -64,6 +65,24 @@ export const updateListing = async (req, res, next) => {
     );
     return res.status(200).json(updatedListing);
   } catch (error) {
+    return next(error);
+  }
+};
+
+export const getListing = async (req, res, next) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+
+    if (!listing) {
+      return next(errorHandler("Listing not found", 404));
+    }
+
+    return res.status(200).json(listing);
+  } catch (error) {
+    // Handles both invalid ID (CastError) and other unexpected errors
+    if (error.name === "CastError") {
+      return next(errorHandler("Invalid listing ID", 400));
+    }
     return next(error);
   }
 };
