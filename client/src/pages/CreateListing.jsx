@@ -176,7 +176,7 @@ export default function CreateListing() {
       toast.success("Listing created successfully!");
 
       setTimeout(() => {
-        navigate(`/listing/${data._id}`);
+        navigate(`/my-listings`);
       }, 2000);
       
     } catch (error) {
