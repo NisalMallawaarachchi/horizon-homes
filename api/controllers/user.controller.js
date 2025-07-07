@@ -75,3 +75,22 @@ export const getUserListings = async (req, res, next) => {
   }
 };
 
+export const getUser = async (req, res, next) => {
+  try {
+    // Fetch user by ID
+    const user = await User.findById(req.params.id);
+
+    // If user not found, return error
+    if (!user) {
+      return next(errorHandler("User not found", 404));
+    }
+
+    // Exclude password from the response
+    const { password: pass, ...rest } = user._doc;
+
+    // Return the user data
+    res.status(200).json(rest);
+  } catch (error) {
+    next(errorHandler("Failed to fetch user", 500));
+  }
+}
