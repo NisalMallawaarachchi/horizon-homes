@@ -12,7 +12,7 @@ export default function ListingItem({ listing }) {
   const discountedPrice = listing.discountedPrice || listing.discountPrice;
 
   return (
-    <div className="bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[300px] md:w-[310px]">
+    <div className="bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[300px] md:w-[270px]">
       <Link to={`/listing/${listing._id}`}>
         <img
           src={imageUrl}
