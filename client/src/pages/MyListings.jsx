@@ -4,6 +4,10 @@ import { FaTrash, FaEdit } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import {
+  FaBed,
+  FaBath,
+} from "react-icons/fa";
 
 export default function MyListings() {
   const [listings, setListings] = useState([]);
@@ -67,7 +71,7 @@ export default function MyListings() {
           {listings.map((listing) => (
             <div
               key={listing._id}
-              className="border rounded-xl overflow-hidden shadow hover:shadow-lg transition flex flex-col h-full relative" // Added relative here
+              className="rounded-xl overflow-hidden shadow hover:shadow-lg transition flex flex-col h-full relative" // Added relative here
             >
               {/* Clickable area covering the image and text */}
               <div
@@ -100,6 +104,17 @@ export default function MyListings() {
                       </span>
                     )}
                   </p>
+                  {/* 👇 Beds and Baths */}
+                  <div className="flex gap-4 text-sm text-gray-600 mt-4">
+                    <span>
+                      <FaBed className="text-emerald-700 mr-2" />
+                      {listing.bedrooms} Bed{listing.bedrooms > 1 ? "s" : ""}
+                    </span>
+                    <span>
+                      <FaBath className="text-emerald-700 mr-2" />
+                      {listing.bathrooms} Bath{listing.bathrooms > 1 ? "s" : ""}
+                    </span>
+                  </div>
                 </div>
               </div>
 
