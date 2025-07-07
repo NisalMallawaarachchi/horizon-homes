@@ -43,7 +43,6 @@ export default function Header() {
       setTimeout(() => {
         navigate("/signin");
       }, 2500);
-      
     } catch (error) {
       dispatch(signOutUserFailure(error.message));
       toast.error("Sign Out failed. Please try again.");
@@ -52,7 +51,10 @@ export default function Header() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate(`/search?searchTerm=${encodeURIComponent(searchTerm)}`);
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set("searchTerm", searchTerm);
+    const searchQuery = urlParams.toString();
+    navigate(`/search?${searchQuery}`);
   };
 
   useEffect(() => {
