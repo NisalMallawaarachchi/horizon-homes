@@ -7,6 +7,7 @@ import connectDB from "./db.js";
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
 import listingRouter from "./routes/listing.route.js";
+import path from "path";
 
 // Load environment variables early
 dotenv.config();
@@ -14,14 +15,18 @@ dotenv.config();
 // Connect to the database
 connectDB();
 
+const __dirname = path.resolve();
+
 // Initialize the Express application
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser()); // Enable cookie parsing
@@ -38,9 +43,10 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/listing", listingRouter);
 
-// Handle unknown routes
+app.use(express.static(path.join(__dirname, "/client/dist")));
+
 app.use("*", (req, res) => {
-  res.status(404).json({ success: false, message: "Route not found" });
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
 });
 
 // Global error handler (middleware)
