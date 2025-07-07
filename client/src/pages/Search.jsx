@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import ListingItem from "../components/ListingItem.jsx";
 
 export default function Search() {
   const [sidebardata, setSidebardata] = useState({
@@ -8,7 +9,7 @@ export default function Search() {
     parking: false,
     furnished: false,
     offer: false,
-    sort: "created_at",
+    sort: "createdAt",
     order: "desc",
   });
 
@@ -18,7 +19,7 @@ export default function Search() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log(listings)
+  console.log(listings);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -45,14 +46,18 @@ export default function Search() {
         parking: parkingFromUrl === "true",
         furnished: furnishedFromUrl === "true",
         offer: offerFromUrl === "true",
-        sort: sortFromUrl || "created_at",
+        sort: sortFromUrl || "createdAt",
         order: orderFromUrl || "desc",
       });
     }
 
     const fetchListings = async () => {
       setLoading(true);
-      const res = await fetch(`/api/listing/get?${urlParams.toString()}`);
+      const searchQuery = new URLSearchParams({
+        ...sidebardata,
+        startIndex: 0, // Add this
+      }).toString();
+      const res = await fetch(`/api/listing/get?${searchQuery}`);
       const data = await res.json();
       setListings(data);
       setShowMore(data.length > 8);
@@ -85,10 +90,13 @@ export default function Search() {
       });
     }
     if (e.target.id === "sort_order") {
-      const sort = e.target.value.split("_")[0] || "created_at";
-      const order = e.target.value.split("_")[1] || "desc";
-      setSidebardata({ ...sidebardata, sort, order });
-    }
+    const [sort, order] = e.target.value.split("_");
+    setSidebardata({ 
+      ...sidebardata, 
+      sort: sort === "regularPrice" ? "regularPrice" : sort,
+      order 
+    });
+  }
   };
 
   const handleSubmit = (e) => {
@@ -101,6 +109,7 @@ export default function Search() {
     urlParams.set("offer", sidebardata.offer);
     urlParams.set("sort", sidebardata.sort);
     urlParams.set("order", sidebardata.order);
+
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
   };
@@ -235,7 +244,7 @@ export default function Search() {
               name="sort_order"
               className="flex-1 bg-gray-50 border border-gray-300 text-gray-700 px-3 py-2 rounded-md focus:outline-none"
               onChange={handleChange}
-              defaultValue={"created_at_desc"}
+              defaultValue={"createdAt_desc"}
             >
               <option value="regularPrice_asc">Price: Low to High</option>
               <option value="regularPrice_desc">Price: High to Low</option>
@@ -260,39 +269,30 @@ export default function Search() {
           Listing Results:
         </h1>
 
-        {loading ? (
-          <p className="text-gray-500">Loading listings...</p>
-        ) : listings.length === 0 ? (
-          <p className="text-red-500">No listings found.</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {listings.map((listing, i) => (
-              <div
-                key={i}
-                className="bg-white p-4 rounded-lg shadow border border-gray-200"
-              >
-                <h3 className="font-semibold text-lg text-gray-800">
-                  {listing.title || "Listing Title"}
-                </h3>
-                <p className="text-gray-600 text-sm mt-1">
-                  {listing.description || "Description goes here..."}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Placeholder for listings */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Example Listing Box */}
-          <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-            <h3 className="font-semibold text-lg text-gray-800">
-              Listing Title
-            </h3>
-            <p className="text-gray-600 text-sm mt-1">
-              Description goes here...
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loading && (
+            <p className="text-lg text-slate-600 text-center w-full">
+              Loading...
             </p>
-          </div>
+          )}
+          {!loading && listings.length === 0 && (
+            <p className="text-lg text-slate-500 text-center w-full">
+              No listings found!
+            </p>
+          )}
+          {!loading &&
+            listings &&
+            listings.map((listing) => (
+              <ListingItem key={listing._id} listing={listing} />
+            ))}
+          {showMore && (
+            <button
+              onClick={onShowMoreClick}
+              className="w-full text-center text-green-700 hover:underline py-4"
+            >
+              Show More
+            </button>
+          )}
         </div>
       </div>
     </div>
