@@ -203,7 +203,7 @@ export default function Listing() {
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Location</h2>
         <div className="flex items-start">
-          <FaMapMarkerAlt className="text-red-500 mt-1 mr-2 flex-shrink-0" />
+          <FaMapMarkerAlt className="text-emerald-700 mt-1 mr-2 flex-shrink-0" />
           <p className="text-gray-700">{listing.address}</p>
         </div>
       </div>

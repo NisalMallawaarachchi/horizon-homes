@@ -4,10 +4,7 @@ import { FaTrash, FaEdit } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import {
-  FaBed,
-  FaBath,
-} from "react-icons/fa";
+import { FaBed, FaBath, FaMapMarkerAlt } from "react-icons/fa";
 
 export default function MyListings() {
   const [listings, setListings] = useState([]);
@@ -87,7 +84,11 @@ export default function MyListings() {
                 </div>
                 <div className="p-4 space-y-1 flex-grow">
                   <h3 className="text-lg font-semibold">{listing.name}</h3>
-                  <p className="text-sm text-gray-600">{listing.address}</p>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <FaMapMarkerAlt className="flex-shrink-0 text-emerald-700" />
+                    <span className="truncate">{listing.address}</span>
+                  </div>
+                  {/* Price Section */}
                   <p className="text-sm text-emerald-600 font-bold">
                     {listing.offer ? (
                       <div className="flex items-center gap-2">
