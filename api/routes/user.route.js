@@ -4,9 +4,9 @@ import {
   getUser,
   test,
   updateUser,
+  getUserListings
 } from "../controllers/user.controller.js";
 import { verifyToken } from "../utils/verifiedUser.js";
-import { getUserListings, getUser } from "../controllers/user.controller.js";
 
 const router = express.Router();
 

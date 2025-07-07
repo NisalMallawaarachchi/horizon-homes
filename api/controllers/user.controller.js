@@ -89,7 +89,7 @@ export const getUser = async (req, res, next) => {
     const { password: pass, ...rest } = user._doc;
 
     // Return the user data
-    res.status(200).json(rest);
+    res.status(200).json({ ...rest, email: user.email }); 
   } catch (error) {
     next(errorHandler("Failed to fetch user", 500));
   }
