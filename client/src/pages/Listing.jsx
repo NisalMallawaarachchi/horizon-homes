@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import { toast } from "react-toastify";
 import {
   FaBed,
   FaBath,
@@ -11,7 +11,10 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import { IoIosArrowBack } from "react-icons/io";
-import { toast } from "react-toastify";
+import Contact from "../components/Contact.jsx";
+
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Listing() {
@@ -20,7 +23,16 @@ export default function Listing() {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [contactLoading, setContactLoading] = useState(false);
+  const [contact, setContact] = useState(false);
+  const currentUser = useSelector((state) => state.user.currentUser);
+  const contactRef = useRef(null);
+
+  useEffect(() => {
+    if (contact && contactRef.current) {
+      contactRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.scrollBy(0, -80); // Adjust offset as needed
+    }
+  }, [contact]);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -45,18 +57,6 @@ export default function Listing() {
 
     fetchListing();
   }, [params.listingId]);
-
-  const handleContactOwner = async () => {
-    try {
-      setContactLoading(true);
-      // Implement your contact logic here
-      toast.success("Contact request sent successfully!");
-    } catch (error) {
-      toast.error("Failed to send contact request");
-    } finally {
-      setContactLoading(false);
-    }
-  };
 
   const sliderSettings = {
     dots: true,
@@ -209,15 +209,20 @@ export default function Listing() {
       </div>
 
       {/* Contact Button */}
-      <button
-        onClick={handleContactOwner}
-        disabled={contactLoading}
-        className={`w-full py-3 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-medium hover:bg-blue-700 transition ${
-          contactLoading ? "opacity-70 cursor-not-allowed" : ""
-        }`}
-      >
-        {contactLoading ? "Processing..." : "Contact Owner"}
-      </button>
+      {currentUser && currentUser._id !== listing.userRef && !contact && (
+        <button
+          onClick={() => setContact(true)}
+          className="w-full py-3 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-medium transition"
+        >
+          Contact Owner
+        </button>
+      )}
+
+      {contact && (
+        <div ref={contactRef}>
+          <Contact listing={listing} currentUser={currentUser} />
+        </div>
+      )}
     </div>
   );
 }
