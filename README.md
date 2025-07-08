@@ -17,7 +17,6 @@ A full-stack real estate listing platform where users can search, post, and mana
 |-----------------------------------|-------------------------------------|
 | ![Home](./screenshots/home.png)   | ![Listing](./screenshots/listing.png) |
 
-> Add screenshots inside a `screenshots` folder to visually showcase your app.
 
 ---
 
