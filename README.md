@@ -49,13 +49,16 @@ git clone https://github.com/NisalMallawaarachchi/horizon-homes.git
 cd horizon-homes
 
 # 2. Install backend dependencies
-cd api
 npm install
 
 # 3. Install frontend dependencies
-cd ../client
+cd client
 npm install
 
-# 4. Go back to root and start the development environment
-cd ..
+# 4. Run the backend
+cd ../
+npm run dev
+
+# 5. Run the frontend
+cd client
 npm run dev
