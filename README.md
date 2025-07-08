@@ -1,53 +1,53 @@
-# 🏡 Real Estate Listing App
+# 🏡 Horizon Homes – Real Estate Listing App
 
-A full-stack web application that allows users to create, browse, and manage real estate listings for rent or sale. Built with **React**, **Tailwind CSS**, **Node.js**, and **Firebase** for a modern and user-friendly experience.
+A full-stack real estate listing platform where users can search, post, and manage properties for rent or sale. Built with **React**, **Tailwind CSS**, **Node.js**, and **Firebase**, Horizon Homes delivers a clean and responsive user experience.
 
 ---
 
 ## 🔗 Live Demo
 
-👉 [View Live Site](https://your-app-on-render.com)  
-👉 [GitHub Repository](https://github.com/your-username/real-estate-app)
+👉 [Visit the Live App](https://horizon-homes-0kuz.onrender.com/)  
+👉 [GitHub Repository](https://github.com/NisalMallawaarachchi/horizon-homes)
 
 ---
 
 ## 📸 Screenshots
 
-| Home Page                          | Listing Details                       |
-|-----------------------------------|----------------------------------------|
-| ![Home](./screenshots/home.png)   | ![Details](./screenshots/details.png) |
+| Home Page                          | Listing Page                        |
+|-----------------------------------|-------------------------------------|
+| ![Home](./screenshots/home.png)   | ![Listing](./screenshots/listing.png) |
 
-> _Add real screenshots in a `screenshots` folder to showcase your app._
+> Add screenshots inside a `screenshots` folder to visually showcase your app.
 
 ---
 
 ## 🚀 Features
 
-- 🔍 Filter listings by type, offer, furnished, and parking
-- 🔐 Secure user authentication (sign up, sign in, sign out)
-- 📝 Create, update, and delete your listings
-- 📸 Upload property images to Firebase Storage
-- 💬 Toast notifications for user feedback
-- 📱 Fully responsive design with Tailwind CSS
+- 🔍 Filter listings by type, parking, offer, and furnishings
+- 🔐 Firebase Authentication (sign up, sign in, sign out)
+- 🏠 Create, update, and delete your listings
+- 📸 Image upload with Firebase Storage
+- 🎉 Toast notifications for actions and feedback
+- 📱 Mobile-first and fully responsive with Tailwind CSS
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Frontend        | Backend       | Auth & Storage     | Deployment       |
-|-----------------|---------------|---------------------|------------------|
-| React + Tailwind CSS | Node.js + Express | Firebase (Auth + Storage + Firestore) | Render + Firebase |
+| Frontend        | Backend       | Auth & DB           | Deployment              |
+|-----------------|---------------|----------------------|--------------------------|
+| React + Tailwind CSS | Node.js + Express | Firebase (Auth, Firestore, Storage) | Render (Backend) + Firebase (Cloud) |
 
 ---
 
-## 📦 Installation Guide
+## 📦 Local Setup Instructions
 
-To run this app locally:
+To run Horizon Homes locally:
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/your-username/real-estate-app.git
-cd real-estate-app
+# 1. Clone the repository
+git clone https://github.com/NisalMallawaarachchi/horizon-homes.git
+cd horizon-homes
 
 # 2. Install backend dependencies
 cd api
@@ -57,6 +57,6 @@ npm install
 cd ../client
 npm install
 
-# 4. Start the development server
+# 4. Go back to root and start the development environment
 cd ..
 npm run dev
